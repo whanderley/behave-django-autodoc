@@ -19,6 +19,9 @@ class BrowserDriverSelenium():
         
     def get_screenshot(self, filename):
         self.browser.get_screenshot(filename)
+        
+    def execute_script(self, script):
+        self.browser.execute_script(script)
 
 class BrowserDriverSplinter():
     

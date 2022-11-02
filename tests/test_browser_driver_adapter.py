@@ -36,6 +36,12 @@ class TestBrowserDriverSelenium(unittest.TestCase):
         browser_driver.get_screenshot('test.jpg')
         browser.get_screenshot.assert_called_once_with('test.jpg') 
         
+    def test_execute_script(self):
+        browser = Mock(__module__='selenium.webdriver.firefox.webdriver')
+        browser.execute_script = MagicMock(return_value=True)
+        browser_driver = BrowserDriver(browser)
+        browser_driver.execute_script('alert("test")')
+        browser.execute_script.assert_called_once_with('alert("test")')
 
 class TestBrowserDriverSplinter(unittest.TestCase):
     
