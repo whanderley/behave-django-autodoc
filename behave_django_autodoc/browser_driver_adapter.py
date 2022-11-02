@@ -30,3 +30,6 @@ class BrowserDriverSplinter():
         
     def get_screenshot(self, filename):
         self.browser.screenshot(filename)
+        
+    def execute_script(self, script):
+        self.browser.execute_script(script)
