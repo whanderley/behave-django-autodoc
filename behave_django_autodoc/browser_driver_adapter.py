@@ -1,0 +1,29 @@
+class UnkownBrowserDriverException(Exception):
+    pass
+
+
+class BrowserDriver(object):
+    
+    def __new__(cls, browser):
+        if browser.__module__.startswith('selenium'):
+            return BrowserDriverSelenium(browser)
+        elif browser.__module__.startswith('splinter'):
+            return BrowserDriverSplinter(browser)
+        raise UnkownBrowserDriverException('Unknown browser driver from module: %s' % browser.__module__)
+    
+
+class BrowserDriverSelenium():
+    
+    def __init__(self, browser) -> None:
+        self.browser = browser
+        
+    def get_screenshot(self, filename):
+        self.browser.get_screenshot(filename)
+
+class BrowserDriverSplinter():
+    
+    def __init__(self, browser) -> None:
+        self.browser = browser
+        
+    def get_screenshot(self, filename):
+        self.browser.screenshot(filename)
