@@ -3,7 +3,6 @@ from behave_django_autodoc.browser_driver_adapter import BrowserDriver, UnkownBr
 from unittest.mock import Mock, MagicMock
 
 
-
 class TestBrowserDriverAdapter(unittest.TestCase):
     
     def test_selenium_browser_driver_adapter(self):
@@ -42,6 +41,14 @@ class TestBrowserDriverSelenium(unittest.TestCase):
         browser_driver = BrowserDriver(browser)
         browser_driver.execute_script('alert("test")')
         browser.execute_script.assert_called_once_with('alert("test")')
+        
+    def test_scroll_to_by_css(self):
+        browser = Mock(__module__='selenium.webdriver.firefox.webdriver')
+        browser.execute_script = MagicMock(return_value=True)
+        browser_driver = BrowserDriver(browser)
+        browser_driver.scroll_to_by_css('#id')
+        browser.execute_script.assert_called_once_with('document.querySelector("#id").scrollIntoView()')
+
 
 class TestBrowserDriverSplinter(unittest.TestCase):
     
@@ -58,8 +65,15 @@ class TestBrowserDriverSplinter(unittest.TestCase):
         browser.screenshot.assert_called_once_with('test.jpg')
         
     def test_execute_script(self):
-        browser = Mock(__module__='selenium.webdriver.firefox.webdriver')
+        browser = Mock(__module__='splinter.driver.webdriver.firefox')
         browser.execute_script = MagicMock(return_value=True)
         browser_driver = BrowserDriver(browser)
         browser_driver.execute_script('alert("test")')
         browser.execute_script.assert_called_once_with('alert("test")')
+        
+    def test_scroll_to_by_css(self):
+        browser = Mock(__module__='splinter.driver.webdriver.firefox')
+        browser.execute_script = MagicMock(return_value=True)
+        browser_driver = BrowserDriver(browser)
+        browser_driver.scroll_to_by_css('#id')
+        browser.execute_script.assert_called_once_with('document.querySelector("#id").scrollIntoView()')

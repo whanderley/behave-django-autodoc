@@ -22,6 +22,9 @@ class BrowserDriverSelenium():
         
     def execute_script(self, script):
         self.browser.execute_script(script)
+        
+    def scroll_to_by_css(self, css_selector):
+        self.browser.execute_script('document.querySelector("%s").scrollIntoView()' % css_selector)
 
 class BrowserDriverSplinter():
     
@@ -33,3 +36,6 @@ class BrowserDriverSplinter():
         
     def execute_script(self, script):
         self.browser.execute_script(script)
+        
+    def scroll_to_by_css(self, css_selector):
+        self.browser.execute_script('document.querySelector("%s").scrollIntoView()' % css_selector)
