@@ -4,7 +4,10 @@ class UnkownBrowserDriverException(Exception):
 
 
 class BrowserDriver(object):
-    '''Factory class for browser drivers'''
+    '''
+    Factory class for browser drivers. It returns the correct driver for the browser,
+    based on the browser module name
+    '''
 
     def __new__(cls, browser):
         if browser.__module__.startswith('selenium'):
