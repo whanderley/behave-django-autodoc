@@ -45,3 +45,5 @@ class Step(object):
         self.screenshot_time = step_dict.get('screenshot_time', 'after')
         if self.layout not in ['vertical', 'horizontal']:
             raise ValueError(f'Invalid layout: {self.layout}')
+        if self.screenshot_time not in ['before', 'after']:
+            raise ValueError(f'Invalid screenshot_time: {self.screenshot_time}')

@@ -3,6 +3,7 @@
 disable=
       C0114, # Missing module docstring
       C0116, # Missing function or method docstring
+      E0611, # No name 'x' in module 'y'
 # Analyse import fallback blocks. This can be used to support both Python 2 and
 # 3 compatible code, which means that the block might have code that exists
 # only in one or another interpreter, leading to false positives when analysed.

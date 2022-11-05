@@ -67,3 +67,7 @@ class TestStep(unittest.TestCase):
     def test_by_default_screenshot_time_after(self):
         step = Step({'tittle': 'test tittle'})
         self.assertEqual(step.screenshot_time, 'after')
+
+    def test_not_accept_invalid_screenshot_time(self):
+        with self.assertRaises(ValueError):
+            Step({'tittle': 'test tittle', 'screenshot_time': 'invalid'})
