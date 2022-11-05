@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from behave_django_autodoc import __version__
 
 

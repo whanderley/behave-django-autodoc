@@ -35,6 +35,3 @@ directory = reports/coverage
 
 [coverage:xml]
 output = reports/coverage.xml
-
-[coverage:paths]
-[flake8]

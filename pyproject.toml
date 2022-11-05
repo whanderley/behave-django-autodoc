@@ -10,6 +10,8 @@ selenium = "^4.5.0"
 splinter = "^0.18.1"
 pylint = "^2.15.5"
 pre-commit = "^2.20.0"
+flake8 = "^5.0.4"
+black = "^22.10.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
