@@ -1,0 +1,40 @@
+[flake8]
+max-line-length = 120
+max-complexity = 10
+
+
+[isort]
+line_length = 120
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+combine_as_imports = true
+skip = migrations
+default_section = THIRDPARTY
+known_django = django
+known_first_party = apps
+sections = FUTURE,STDLIB,DJANGO,THIRDPARTY,FIRSTPARTY,LOCALFOLDER
+
+[coverage:run]
+branch = True
+source = apps
+
+exclude_lines =
+    pragma: no cover
+    def __str__
+    def __repr__
+    if __name__ == .__main__.:
+    raise AssertionError
+    raise NotImplementedError
+    @abc.abstractmethod
+    if settings.DEBUG
+    if settings.TESTING
+
+[coverage:html]
+directory = reports/coverage
+
+[coverage:xml]
+output = reports/coverage.xml
+
+[coverage:paths]
+[flake8]
