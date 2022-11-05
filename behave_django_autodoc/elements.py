@@ -27,3 +27,21 @@ class Scenario(object):
         self.layout = scenario_dict.get('layout', 'vertical')
         if self.layout not in ['vertical', 'horizontal']:
             raise ValueError(f'Invalid layout: {self.layout}')
+
+
+class Step(object):
+    '''
+    Step object representation
+    fields:
+        tittle: step tittle
+        description: step description(optional)
+        layout: step layout, vertical or horizontal(optional)
+        screenshot_time: when to take the screenshot, before or after the step(optional)
+    '''
+    def __init__(self, step_dict) -> None:
+        self.tittle = step_dict['tittle']
+        self.description = step_dict.get('description', None)
+        self.layout = step_dict.get('layout', 'vertical')
+        self.screenshot_time = step_dict.get('screenshot_time', 'after')
+        if self.layout not in ['vertical', 'horizontal']:
+            raise ValueError(f'Invalid layout: {self.layout}')

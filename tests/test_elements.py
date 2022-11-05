@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import unittest
-from behave_django_autodoc.elements import Feature, Scenario
+from behave_django_autodoc.elements import Feature, Scenario, Step
 
 
 class TestFeature(unittest.TestCase):
@@ -37,3 +37,33 @@ class TestScenario(unittest.TestCase):
     def test_not_accept_invalid_layout(self):
         with self.assertRaises(ValueError):
             Scenario({'tittle': 'test tittle', 'layout': 'invalid'})
+
+
+class TestStep(unittest.TestCase):
+
+    def test_init(self):
+        step = Step({'tittle': 'test tittle', 'description': 'test description', 'layout': 'vertical'})
+        self.assertEqual(step.tittle, 'test tittle')
+        self.assertEqual(step.description, 'test description')
+        self.assertEqual(step.layout, 'vertical')
+
+    def test_init_with_empty_description(self):
+        step = Step({'tittle': 'test tittle'})
+        self.assertEqual(step.tittle, 'test tittle')
+        self.assertEqual(step.description, None)
+
+    def test_by_default_vertical_layout(self):
+        step = Step({'tittle': 'test tittle'})
+        self.assertEqual(step.layout, 'vertical')
+
+    def test_not_accept_invalid_layout(self):
+        with self.assertRaises(ValueError):
+            Step({'tittle': 'test tittle', 'layout': 'invalid'})
+
+    def test_screenshot_time(self):
+        step = Step({'tittle': 'test tittle', 'screenshot_time': 'after'})
+        self.assertEqual(step.screenshot_time, 'after')
+
+    def test_by_default_screenshot_time_after(self):
+        step = Step({'tittle': 'test tittle'})
+        self.assertEqual(step.screenshot_time, 'after')
