@@ -23,13 +23,35 @@ repos:
         - flake8-string-format
         - pep8-naming
         args: [--config, .flake8]
-
+#pytest
 -   repo: local
     hooks:
-    - id: pytest
-      name: pytest
-      language: system
-      entry: poetry run pytest
-      always_run: true
-      pass_filenames: false
-      stages: [commit]
+    -   id: pytest
+        name: pytest
+        stages: [commit]
+        language: system
+        entry: poetry run pytest -s -v
+        types: [python]
+        pass_filenames: false
+        always_run: true
+    -   id: pytest-cov
+        name: pytest-cov
+        stages: [commit]
+        language: system
+        entry: poetry run pytest --cov=behave_django_autodoc --cov-report=term-missing -s -v --cov-fail-under=90 tests/
+        types: [python]
+        pass_filenames: false
+        always_run: true
+    -  id: pytest-cov-html
+       name: pytest-cov-html
+       stages: [commit]
+       language: system
+       entry: poetry run pytest --cov=behave_django_autodoc --cov-report=html -s -v --cov-fail-under=90 tests/
+       types: [python]
+       pass_filenames: false
+       always_run: true
+#reorder_python_imports
+-   repo: https://github.com/asottile/reorder_python_imports
+    rev: v3.9.0
+    hooks:
+    -   id: reorder-python-imports
