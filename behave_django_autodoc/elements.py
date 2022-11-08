@@ -30,15 +30,11 @@ class Scenario(object):
     fields:
         tittle: scenario tittle
         description: scenario description(optional)
-        layout: scenario layout, vertical or horizontal(optional)
     """
 
     def __init__(self, scenario_dict) -> None:
         self.tittle = scenario_dict["tittle"]
         self.description = scenario_dict.get("description", None)
-        self.layout = scenario_dict.get("layout", "vertical")
-        if self.layout not in ["vertical", "horizontal"]:
-            raise ValueError(f"Invalid layout: {self.layout}")
 
     def to_html(self):
         """Generate the scenario html"""
