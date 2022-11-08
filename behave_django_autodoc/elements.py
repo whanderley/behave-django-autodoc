@@ -15,9 +15,10 @@ class Feature(object):
         description: feature description(optional)
     """
 
-    def __init__(self, feature_dict) -> None:
+    def __init__(self, feature_dict: dict, scenarios: list = None) -> None:
         self.title = feature_dict["title"]
         self.description = feature_dict.get("description", None)
+        self.scenarios = scenarios
 
     def to_html(self):
         """Generate the feature html"""
@@ -36,7 +37,7 @@ class Scenario(object):
         description: scenario description(optional)
     """
 
-    def __init__(self, scenario_dict) -> None:
+    def __init__(self, scenario_dict: dict) -> None:
         self.title = scenario_dict["title"]
         self.description = scenario_dict.get("description", None)
 
@@ -60,7 +61,7 @@ class Step(object):
         screenshot_time: when to take the screenshot, before or after the step(optional, default after)
     """
 
-    def __init__(self, step_dict) -> None:
+    def __init__(self, step_dict: dict) -> None:
         self.title = step_dict["title"]
         self.description = step_dict.get("description", None)
         self.layout = step_dict.get("layout", "vertical")
@@ -71,7 +72,7 @@ class Step(object):
         if self.screenshot_time not in ["before", "after"]:
             raise ValueError(f"Invalid screenshot_time: {self.screenshot_time}")
 
-    def to_html(self, step_screenshot_base64=None):
+    def to_html(self, step_screenshot_base64: str = None) -> str:
         """Generate the step html"""
         if self.screenshot and not step_screenshot_base64:
             raise ScreenShotError("Screenshot base64 not found")

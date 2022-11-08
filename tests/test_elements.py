@@ -39,6 +39,11 @@ class TestFeature(unittest.TestCase):
         html = feature.to_html()
         self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
 
+    def test_has_scenarios(self):
+        scenarios = [Scenario({"title": "test title", "description": "test description"})]
+        feature = Feature({"title": "test title", "description": "test description"}, scenarios=scenarios)
+        self.assertEqual(feature.scenarios, scenarios)
+
 
 class TestScenario(unittest.TestCase):
     def test_init(self):
