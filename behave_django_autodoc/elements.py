@@ -37,8 +37,9 @@ class Step(object):
     fields:
         tittle: step tittle
         description: step description(optional)
-        layout: step layout, vertical or horizontal(optional)
-        screenshot_time: when to take the screenshot, before or after the step(optional)
+        layout: step layout, vertical or horizontal(optional, default vertical)
+        screenshot: configure if the step should have a screenshot(optional, default True)
+        screenshot_time: when to take the screenshot, before or after the step(optional, default after)
     """
 
     def __init__(self, step_dict) -> None:
