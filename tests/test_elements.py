@@ -7,6 +7,10 @@ from behave_django_autodoc.elements import Step
 
 
 class TestFeature(unittest.TestCase):
+
+    def _strip_whitespace(self, string):
+        return string.replace(" ", "").replace("\t", "").replace("\n", "")
+
     def test_init(self):
         feature = Feature({"tittle": "test tittle", "description": "test description"})
         self.assertEqual(feature.tittle, "test tittle")
@@ -16,6 +20,19 @@ class TestFeature(unittest.TestCase):
         feature = Feature({"tittle": "test tittle"})
         self.assertEqual(feature.tittle, "test tittle")
         self.assertEqual(feature.description, None)
+
+    def test_to_html(self):
+        expected_html = """
+        <h2 class="feature-tittle"> test tittle </h2>
+        <div class="row">
+            <div class="col-8">
+                <p class="feature-description">test description</p>
+            </div>
+        </div>
+        """
+        feature = Feature({"tittle": "test tittle", "description": "test description"})
+        html = feature.to_html()
+        self.assertEqual(self._strip_whitespace(html), self._strip_whitespace(expected_html))
 
 
 class TestScenario(unittest.TestCase):

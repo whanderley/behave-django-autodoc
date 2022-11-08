@@ -1,4 +1,6 @@
 """Abstraction of the elements from the behave, like feature, scenario and step."""
+from jinja2 import Template as JinjaTemplate
+from pkg_resources import resource_string
 
 
 class Feature(object):
@@ -12,6 +14,14 @@ class Feature(object):
     def __init__(self, feature_dict) -> None:
         self.tittle = feature_dict["tittle"]
         self.description = feature_dict.get("description", None)
+
+    def to_html(self):
+        """Generate the feature html"""
+
+        feature_string = resource_string(
+            "behave_django_autodoc", "assets/feature.html").decode('utf-8')
+        feature_template = JinjaTemplate(feature_string)
+        return feature_template.render(feature=self)
 
 
 class Scenario(object):
