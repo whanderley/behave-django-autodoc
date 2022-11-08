@@ -13,9 +13,6 @@ def _strip_whitespace(string):
 
 class TestFeature(unittest.TestCase):
 
-    def _strip_whitespace(self, string):
-        return string.replace(" ", "").replace("\t", "").replace("\n", "")
-
     def test_init(self):
         feature = Feature({"title": "test title", "description": "test description"})
         self.assertEqual(feature.title, "test title")
@@ -78,6 +75,11 @@ class TestScenario(unittest.TestCase):
         )
         html = scenario.to_html()
         self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_has_steps(self):
+        steps = [Step({"title": "test title", "description": "test description"})]
+        scenario = Scenario({"title": "test title", "description": "test description"}, steps=steps)
+        self.assertEqual(scenario.steps, steps)
 
 
 class TestStep(unittest.TestCase):

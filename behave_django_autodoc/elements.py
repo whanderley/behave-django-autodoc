@@ -37,9 +37,10 @@ class Scenario(object):
         description: scenario description(optional)
     """
 
-    def __init__(self, scenario_dict: dict) -> None:
+    def __init__(self, scenario_dict: dict, steps: list = None) -> None:
         self.title = scenario_dict["title"]
         self.description = scenario_dict.get("description", None)
+        self.steps = steps
 
     def to_html(self):
         """Generate the scenario html"""
