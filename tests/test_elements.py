@@ -83,3 +83,11 @@ class TestStep(unittest.TestCase):
     def test_not_accept_invalid_screenshot_time(self):
         with self.assertRaises(ValueError):
             Step({"tittle": "test tittle", "screenshot_time": "invalid"})
+
+    def test_without_screen_shot(self):
+        step = Step({"tittle": "test tittle", "screenshot": False})
+        self.assertFalse(step.screenshot)
+
+    def test_by_default_has_screen_shot(self):
+        step = Step({"tittle": "test tittle"})
+        self.assertTrue(step.screenshot)
