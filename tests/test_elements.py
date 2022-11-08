@@ -6,6 +6,10 @@ from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.elements import Step
 
 
+def _strip_whitespace(string):
+    return string.replace(" ", "").replace("\t", "").replace("\n", "")
+
+
 class TestFeature(unittest.TestCase):
 
     def _strip_whitespace(self, string):
@@ -32,7 +36,7 @@ class TestFeature(unittest.TestCase):
         """
         feature = Feature({"tittle": "test tittle", "description": "test description"})
         html = feature.to_html()
-        self.assertEqual(self._strip_whitespace(html), self._strip_whitespace(expected_html))
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
 
 
 class TestScenario(unittest.TestCase):
@@ -61,6 +65,25 @@ class TestScenario(unittest.TestCase):
     def test_not_accept_invalid_layout(self):
         with self.assertRaises(ValueError):
             Scenario({"tittle": "test tittle", "layout": "invalid"})
+
+    def test_to_html(self):
+        expected_html = """
+        <h3 class="scenario-tittle"> test tittle </h3>
+        <div class="row">
+            <div class="col-8">
+                <p class="scenario-description">test description</p>
+            </div>
+        </div>
+        """
+        scenario = Scenario(
+            {
+                "tittle": "test tittle",
+                "description": "test description",
+                "layout": "vertical",
+            }
+        )
+        html = scenario.to_html()
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
 
 
 class TestStep(unittest.TestCase):

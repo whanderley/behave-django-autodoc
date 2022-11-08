@@ -40,6 +40,14 @@ class Scenario(object):
         if self.layout not in ["vertical", "horizontal"]:
             raise ValueError(f"Invalid layout: {self.layout}")
 
+    def to_html(self):
+        """Generate the scenario html"""
+
+        scenario_string = resource_string(
+            "behave_django_autodoc", "assets/scenario.html").decode('utf-8')
+        scenario_template = JinjaTemplate(scenario_string)
+        return scenario_template.render(scenario=self)
+
 
 class Step(object):
     """
