@@ -1,0 +1,11 @@
+<div class="row step">
+    {% if step.screenshot %}
+        <div class="col-12"><img src='{{ step_screenshot_base64 }}' class="img-fluid rounded" /></div>
+    {% endif %}
+    <div class="col-12">
+        <span class="align-middle">
+            <p class=step-title>{{ step.title }}</p>
+            <p class="step-description">{{ step.description or ' ' }}</p>
+        </span>
+    </div>
+</div>

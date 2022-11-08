@@ -3,6 +3,7 @@ import unittest
 
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
+from behave_django_autodoc.elements import ScreenShotError
 from behave_django_autodoc.elements import Step
 
 
@@ -16,25 +17,25 @@ class TestFeature(unittest.TestCase):
         return string.replace(" ", "").replace("\t", "").replace("\n", "")
 
     def test_init(self):
-        feature = Feature({"tittle": "test tittle", "description": "test description"})
-        self.assertEqual(feature.tittle, "test tittle")
+        feature = Feature({"title": "test title", "description": "test description"})
+        self.assertEqual(feature.title, "test title")
         self.assertEqual(feature.description, "test description")
 
     def test_init_with_empty_description(self):
-        feature = Feature({"tittle": "test tittle"})
-        self.assertEqual(feature.tittle, "test tittle")
+        feature = Feature({"title": "test title"})
+        self.assertEqual(feature.title, "test title")
         self.assertEqual(feature.description, None)
 
     def test_to_html(self):
         expected_html = """
-        <h2 class="feature-tittle"> test tittle </h2>
+        <h2 class="feature-title"> test title </h2>
         <div class="row">
             <div class="col-8">
                 <p class="feature-description">test description</p>
             </div>
         </div>
         """
-        feature = Feature({"tittle": "test tittle", "description": "test description"})
+        feature = Feature({"title": "test title", "description": "test description"})
         html = feature.to_html()
         self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
 
@@ -43,21 +44,21 @@ class TestScenario(unittest.TestCase):
     def test_init(self):
         scenario = Scenario(
             {
-                "tittle": "test tittle",
+                "title": "test title",
                 "description": "test description",
             }
         )
-        self.assertEqual(scenario.tittle, "test tittle")
+        self.assertEqual(scenario.title, "test title")
         self.assertEqual(scenario.description, "test description")
 
     def test_init_with_empty_description(self):
-        scenario = Scenario({"tittle": "test tittle", "layout": "vertical"})
-        self.assertEqual(scenario.tittle, "test tittle")
+        scenario = Scenario({"title": "test title", "layout": "vertical"})
+        self.assertEqual(scenario.title, "test title")
         self.assertEqual(scenario.description, None)
 
     def test_to_html(self):
         expected_html = """
-        <h3 class="scenario-tittle"> test tittle </h3>
+        <h3 class="scenario-title"> test title </h3>
         <div class="row">
             <div class="col-8">
                 <p class="scenario-description">test description</p>
@@ -66,7 +67,7 @@ class TestScenario(unittest.TestCase):
         """
         scenario = Scenario(
             {
-                "tittle": "test tittle",
+                "title": "test title",
                 "description": "test description",
             }
         )
@@ -78,44 +79,139 @@ class TestStep(unittest.TestCase):
     def test_init(self):
         step = Step(
             {
-                "tittle": "test tittle",
+                "title": "test title",
                 "description": "test description",
                 "layout": "vertical",
             }
         )
-        self.assertEqual(step.tittle, "test tittle")
+        self.assertEqual(step.title, "test title")
         self.assertEqual(step.description, "test description")
         self.assertEqual(step.layout, "vertical")
 
     def test_init_with_empty_description(self):
-        step = Step({"tittle": "test tittle"})
-        self.assertEqual(step.tittle, "test tittle")
+        step = Step({"title": "test title"})
+        self.assertEqual(step.title, "test title")
         self.assertEqual(step.description, None)
 
     def test_by_default_vertical_layout(self):
-        step = Step({"tittle": "test tittle"})
+        step = Step({"title": "test title"})
         self.assertEqual(step.layout, "vertical")
 
     def test_not_accept_invalid_layout(self):
         with self.assertRaises(ValueError):
-            Step({"tittle": "test tittle", "layout": "invalid"})
+            Step({"title": "test title", "layout": "invalid"})
 
     def test_screenshot_time(self):
-        step = Step({"tittle": "test tittle", "screenshot_time": "after"})
+        step = Step({"title": "test title", "screenshot_time": "after"})
         self.assertEqual(step.screenshot_time, "after")
 
     def test_by_default_screenshot_time_after(self):
-        step = Step({"tittle": "test tittle"})
+        step = Step({"title": "test title"})
         self.assertEqual(step.screenshot_time, "after")
 
     def test_not_accept_invalid_screenshot_time(self):
         with self.assertRaises(ValueError):
-            Step({"tittle": "test tittle", "screenshot_time": "invalid"})
+            Step({"title": "test title", "screenshot_time": "invalid"})
 
     def test_without_screen_shot(self):
-        step = Step({"tittle": "test tittle", "screenshot": False})
+        step = Step({"title": "test title", "screenshot": False})
         self.assertFalse(step.screenshot)
 
     def test_by_default_has_screen_shot(self):
-        step = Step({"tittle": "test tittle"})
+        step = Step({"title": "test title"})
         self.assertTrue(step.screenshot)
+
+    def test_to_html_vertical_step(self):
+        expected_html = """
+        <div class="row step">
+            <div class="col-12">
+                <span class="align-middle">
+                    <p class=step-title>test title</p>
+                    <p class="step-description">test description</p>
+                </span>
+            </div>
+        </div>
+        """
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "vertical",
+                "screenshot": False,
+            }
+        )
+        html = step.to_html()
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_to_html_horizontal_step(self):
+        expected_html = """
+        <div class="row step">
+            <div class="col-6">
+                <span class="align-middle">
+                    <p class=step-title>test title</p>
+                    <p class="step-description">test description</p>
+                </span>
+            </div>
+        </div>
+        """
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "horizontal",
+                "screenshot": False,
+            }
+        )
+        html = step.to_html()
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_to_horizontal_html_with_screenshot(self):
+        expected_html = """
+        <div class="row step">
+            <div class="col-6"><img src='screenshot_base64' class="img-fluid rounded" /></div>
+            <div class="col-6">
+                <span class="align-middle">
+                    <p class=step-title>test title</p>
+                    <p class="step-description">test description</p>
+                </span>
+            </div>
+        </div>
+        """
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "horizontal",
+                "screenshot": True,
+            }
+        )
+        html = step.to_html(step_screenshot_base64='screenshot_base64')
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_to_vertical_html_with_screenshot(self):
+        expected_html = """
+        <div class="row step">
+            <div class="col-12"><img src='screenshot_base64' class="img-fluid rounded" /></div>
+            <div class="col-12">
+                <span class="align-middle">
+                    <p class=step-title>test title</p>
+                    <p class="step-description">test description</p>
+                </span>
+            </div>
+        </div>
+        """
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "vertical",
+                "screenshot": True,
+            }
+        )
+        html = step.to_html(step_screenshot_base64='screenshot_base64')
+        self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_step_screenshot_base64_is_mandatory_when_screenshot_is_true(self):
+        with self.assertRaises(ScreenShotError):
+            step = Step({"title": "test title", "screenshot": True})
+            step.to_html()
