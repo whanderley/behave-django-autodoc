@@ -3,6 +3,8 @@ Module to build the html string containing the documentation.
 """
 from pkg_resources import resource_string
 
+from behave_django_autodoc.output_formats import OutputFormat
+
 
 class HtmlBuilder(object):
     """
@@ -33,3 +35,14 @@ class HtmlBuilder(object):
         :param step: step object
         """
         self.string += step.to_html()
+
+    def save(self, docs_dir):
+        """
+        Save the html string in the chosen formats(for now only html is available).
+        :param docs_dir: directory where the documentation will be saved
+        """
+        self.string += resource_string(
+           "behave_django_autodoc", "assets/final_html.html").decode('utf-8')
+        self.string += resource_string(
+            "docme", "assets/doc.css").decode('utf-8') + "</style></html>"
+        OutputFormat(self.string, ['html'], docs_dir).save()

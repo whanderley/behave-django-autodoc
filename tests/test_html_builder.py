@@ -26,3 +26,12 @@ class TestHtmlBuilder(unittest.TestCase):
         html_builder = HtmlBuilder()
         html_builder.add_step(mock.Mock(to_html=mock.Mock(return_value="step string")))
         self.assertIn("step string", html_builder.string)
+
+    @mock.patch('behave_django_autodoc.html_builder.resource_string')
+    @mock.patch('behave_django_autodoc.html_builder.OutputFormat', autospec=True)
+    def test_save(self, mock_output_format, mock_resource_string):
+        mock_resource_string.return_value.decode.return_value = "final html"
+        html_builder = HtmlBuilder()
+        html_builder.save('auto_docs')
+        self.assertIn("final html", html_builder.string)
+        mock_output_format(html_builder.string, 'auto_docs', ['html']).save.assert_called_with()
