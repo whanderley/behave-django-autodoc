@@ -26,3 +26,10 @@ class HtmlBuilder(object):
         :param scenario: scenario object
         """
         self.string += scenario.to_html()
+
+    def add_step(self, step):
+        """
+        Add a step to the html string.
+        :param step: step object
+        """
+        self.string += step.to_html()

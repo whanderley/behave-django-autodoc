@@ -21,3 +21,8 @@ class TestHtmlBuilder(unittest.TestCase):
         html_builder = HtmlBuilder()
         html_builder.add_scenario(mock.Mock(to_html=mock.Mock(return_value="scenario string")))
         self.assertIn("scenario string", html_builder.string)
+
+    def test_add_step(self):
+        html_builder = HtmlBuilder()
+        html_builder.add_step(mock.Mock(to_html=mock.Mock(return_value="step string")))
+        self.assertIn("step string", html_builder.string)
