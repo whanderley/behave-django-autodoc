@@ -8,6 +8,7 @@ from behave_django_autodoc.browser_driver_adapter import UnkownBrowserDriverExce
 
 
 class TestBrowserDriverAdapter(unittest.TestCase):
+
     def test_selenium_browser_driver_adapter(self):
         browser = Mock(__module__="selenium.webdriver.firefox.webdriver")
         browser_driver = BrowserDriver(browser)
@@ -25,6 +26,7 @@ class TestBrowserDriverAdapter(unittest.TestCase):
 
 
 class TestBrowserDriverSelenium(unittest.TestCase):
+
     def test_init(self):
         browser = Mock(__module__="selenium.webdriver.firefox.webdriver")
         browser_driver = BrowserDriver(browser)
@@ -55,6 +57,7 @@ class TestBrowserDriverSelenium(unittest.TestCase):
 
 
 class TestBrowserDriverSplinter(unittest.TestCase):
+
     def test_init(self):
         browser = Mock(__module__="splinter.driver.webdriver.firefox")
         browser_driver = BrowserDriver(browser)
