@@ -30,3 +30,12 @@ class BaseDecorator(object):
     @property
     def images_dir(self):
         return os.path.join(self.docs_dir, 'images')
+
+
+class BeforeAllDecorator(BaseDecorator):
+    """
+    Decorator to be used in before_all function.
+    """
+
+    def create_docs_dir(self):
+        os.makedirs(self.docs_dir, exist_ok=True)

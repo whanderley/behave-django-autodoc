@@ -3,6 +3,7 @@ from unittest import mock
 from unittest.mock import Mock
 
 from behave_django_autodoc.decorators import BaseDecorator
+from behave_django_autodoc.decorators import BeforeAllDecorator
 
 
 class TestBaseDecorator(unittest.TestCase):
@@ -44,3 +45,16 @@ class TestBaseDecorator(unittest.TestCase):
         mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
         base_decorator = BaseDecorator(function)
         self.assertEqual(base_decorator.images_dir, "enviroment_dir/behave_django_autodoc/docs/images")
+
+
+class TestBeforeAllDecorator(unittest.TestCase):
+
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir',
+                new_callable=mock.PropertyMock)
+    @mock.patch('behave_django_autodoc.decorators.os.makedirs')
+    def create_docs_dir(self, mock_docs_dir, mock_makedirs):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
+        before_all_decorator = BeforeAllDecorator(function)
+        before_all_decorator.create_docs_dir()
+        mock_makedirs.assert_called_once_with("enviroment_dir/behave_django_autodoc/docs", exist_ok=True)
