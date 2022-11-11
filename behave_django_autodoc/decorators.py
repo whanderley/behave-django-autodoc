@@ -43,10 +43,20 @@ class BeforeAllDecorator(BaseDecorator):
     Decorator to be used in before_all function.
     """
 
+    def __call__(self, context):
+        """
+        Call before_all function.
+        fields:
+            context: behave context
+        """
+        self.create_docs_dir()
+        context.html_doc_builder = self.initialize_html_documentation()
+        self.function(context)
+
     def create_docs_dir(self):
         """Create or replace docs directory."""
         os.makedirs(self.docs_dir, exist_ok=True)
 
     def initialize_html_documentation(self):
         """Initialize html documentation."""
-        self.html_documentation = HtmlBuilder()
+        return HtmlBuilder()

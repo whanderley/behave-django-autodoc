@@ -63,5 +63,15 @@ class TestBeforeAllDecorator(unittest.TestCase):
     def test_initializate_html_documentation(self):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         before_all_decorator = BeforeAllDecorator(function)
-        before_all_decorator.initialize_html_documentation()
-        self.assertEqual(before_all_decorator.html_documentation.__class__, HtmlBuilder)
+        before_all_decorator
+        self.assertEqual(before_all_decorator.initialize_html_documentation().__class__, HtmlBuilder)
+
+    def test_call(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_all_decorator = BeforeAllDecorator(function)
+        context = Mock()
+        before_all_decorator.create_docs_dir = Mock()
+        before_all_decorator(context)
+        before_all_decorator.create_docs_dir.assert_called_once_with()
+        function.assert_called_once_with(context)
+        self.assertEqual(context.html_doc_builder.__class__, HtmlBuilder)
