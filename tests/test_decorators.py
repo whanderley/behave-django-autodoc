@@ -2,6 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import Mock
 
+from behave_django_autodoc.decorators import AfterAllDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
 from behave_django_autodoc.html_builder import HtmlBuilder
@@ -75,3 +76,16 @@ class TestBeforeAllDecorator(unittest.TestCase):
         before_all_decorator.create_docs_dir.assert_called_once_with()
         function.assert_called_once_with(context)
         self.assertEqual(context.html_doc_builder.__class__, HtmlBuilder)
+
+
+class TestAfterAllDecorator(unittest.TestCase):
+
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir',  new_callable=mock.PropertyMock)
+    def test_call(self, mock_docs_dir):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        after_all_decorator = AfterAllDecorator(function)
+        context = Mock()
+        mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
+        after_all_decorator(context)
+        function.assert_called_once_with(context)
+        context.html_doc_builder.save.assert_called_once_with("enviroment_dir/behave_django_autodoc/docs")

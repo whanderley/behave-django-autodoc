@@ -46,6 +46,7 @@ class BeforeAllDecorator(BaseDecorator):
     def __call__(self, context):
         """
         Call before_all function.
+        create docs directory and initialize html documentation.
         fields:
             context: behave context
         """
@@ -60,3 +61,19 @@ class BeforeAllDecorator(BaseDecorator):
     def initialize_html_documentation(self):
         """Initialize html documentation."""
         return HtmlBuilder()
+
+
+class AfterAllDecorator(BaseDecorator):
+    """
+    Decorator to be used in after_all function.
+    """
+
+    def __call__(self, context):
+        """
+        Call after_all function.
+        Save html documentation.
+        fields:
+            context: behave context
+        """
+        context.html_doc_builder.save(self.docs_dir)
+        self.function(context)
