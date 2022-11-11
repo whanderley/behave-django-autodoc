@@ -3,7 +3,6 @@ from unittest import mock
 from unittest.mock import Mock
 
 from behave_django_autodoc.decorators import BaseDecorator
-from behave_django_autodoc.decorators import BeforeAllDecorator
 
 
 class TestBaseDecorator(unittest.TestCase):
@@ -14,22 +13,34 @@ class TestBaseDecorator(unittest.TestCase):
         self.assertEqual(base_decorator.function, function)
 
     @mock.patch('behave_django_autodoc.decorators.os.path')
-    def test_docs_dir(self, mock_path):
-        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+    def test_get_behave_django_autodoc_dir(self, mock_path):
+        function = Mock(__globals__={"__file__": "enviroment_dir/enviroment.py"})
         mock_path.dirname.return_value = "enviroment_dir"
-        mock_path.join.return_value = "enviroment_dir/docs"
+        mock_path.join.return_value = "enviroment_dir/behave_django_autodoc"
         base_decorator = BaseDecorator(function)
-        self.assertEqual(base_decorator.docs_dir(), "enviroment_dir/docs")
+        self.assertEqual(base_decorator.behave_django_autodoc_dir, "enviroment_dir/behave_django_autodoc")
 
-
-class TestBeforeAllDecorator(unittest.TestCase):
-
-    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir')
-    @mock.patch('behave_django_autodoc.decorators.os.path')
-    def test_get_configs_dir(self, mock_path, mock_docs_dir):
+    @mock.patch('behave_django_autodoc.decorators.os.path.join')
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.behave_django_autodoc_dir',
+                new_callable=mock.PropertyMock)
+    def test_get_docs_dir(self, mock_behave_django_autodoc_dir, mock_path_join):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
-        base_decorator = BeforeAllDecorator(function)
-        mock_path.dirname.return_value = "enviroment_dir"
-        mock_docs_dir.return_value = "enviroment_dir/docs"
-        base_decorator.get_features_configs_dir()
-        mock_path.join.assert_called_with("enviroment_dir/docs", "features_configs")
+        mock_behave_django_autodoc_dir.return_value = "enviroment_dir/behave_django_autodoc"
+        base_decorator = BaseDecorator(function)
+        base_decorator.docs_dir
+        mock_path_join.assert_called_once_with("enviroment_dir/behave_django_autodoc", 'docs')
+
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.behave_django_autodoc_dir',
+                new_callable=mock.PropertyMock)
+    def test_get_features_configs_dir(self, mock_behave_django_autodoc_dir):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        mock_behave_django_autodoc_dir.return_value = "enviroment_dir/behave_django_autodoc"
+        base_decorator = BaseDecorator(function)
+        self.assertEqual(base_decorator.features_configs_dir, "enviroment_dir/behave_django_autodoc/features_configs")
+
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir', new_callable=mock.PropertyMock)
+    def test_get_images_dir(self, mock_docs_dir):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
+        base_decorator = BaseDecorator(function)
+        self.assertEqual(base_decorator.images_dir, "enviroment_dir/behave_django_autodoc/docs/images")

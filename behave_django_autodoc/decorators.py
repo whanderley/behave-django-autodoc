@@ -15,14 +15,18 @@ class BaseDecorator(object):
     def __init__(self, function):
         self.function = function
 
+    @property
+    def behave_django_autodoc_dir(self):
+        return os.path.join(os.path.dirname(self.function.__globals__["__file__"]), 'behave_django_autodoc')
+
+    @property
     def docs_dir(self):
-        return os.path.join(os.path.dirname(self.function.__globals__["__file__"]), 'docs')
+        return os.path.join(self.behave_django_autodoc_dir, 'docs')
 
+    @property
+    def features_configs_dir(self):
+        return os.path.join(self.behave_django_autodoc_dir, 'features_configs')
 
-class BeforeAllDecorator(BaseDecorator):
-    """
-    Decorator to be used in before_all function.
-    """
-
-    def get_features_configs_dir(self):
-        return os.path.join(self.docs_dir(), 'features_configs')
+    @property
+    def images_dir(self):
+        return os.path.join(self.docs_dir, 'images')
