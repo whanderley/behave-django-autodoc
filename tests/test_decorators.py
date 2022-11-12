@@ -139,3 +139,22 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         feature_dict = {"title": "feature", "description": "description", "scenarios": [{"scenario": "scenario"}]}
         self.assertEqual(before_feature_decorator.extract_feature_config(feature_dict),
                          {"title": "feature", "description": "description"})
+
+    @mock.patch('behave_django_autodoc.html_builder.HtmlBuilder.add_feature')
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.extract_feature_config')
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.load_feature_config')
+    def test_call(self, mock_load_feature_config, mock_extract_feature_config, mock_add_feature):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        feature = Mock(filename="filename.feature")
+        context = Mock()
+        mock_load_feature_config.return_value = {"title": "feature", "description": "description",
+                                                 "scenarios": [{"scenario": "scenario"}]},
+        mock_extract_feature_config.return_value = {"title": "feature", "description": "description"}
+        before_feature_decorator(context, feature)
+        before_feature_decorator.load_feature_config.assert_called_once_with(feature)
+        before_feature_decorator.extract_feature_config.assert_called_once_with(
+            before_feature_decorator.load_feature_config.return_value)
+        function.assert_called_once_with(context, feature)
+        context.html_doc_builder.add_feature.assert_called()
+        self.assertEqual(context.feature_config, before_feature_decorator.load_feature_config.return_value)

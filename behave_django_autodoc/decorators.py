@@ -5,6 +5,7 @@ import os
 
 import yaml
 
+from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -94,7 +95,9 @@ class BeforeFeatureDecorator(BaseDecorator):
             context: behave context
             feature: behave feature
         """
-        context.html_doc_builder.add_feature(feature)
+        feature_config = self.load_feature_config(feature)
+        context.html_doc_builder.add_feature(Feature(feature_dict=self.extract_feature_config(feature_config)))
+        context.feature_config = feature_config
         self.function(context, feature)
 
     def get_feature_config_path(self, feature):
