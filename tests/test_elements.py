@@ -227,3 +227,13 @@ class TestStep(unittest.TestCase):
         with self.assertRaises(ScreenShotError):
             step = Step({"title": "test title", "screenshot": True})
             step.to_html()
+
+    def test_equal(self):
+        step1 = Step({"title": "test title", "description": "test description"})
+        step2 = Step({"title": "test title", "description": "test description"})
+        self.assertEqual(step1, step2)
+
+    def test_not_equal(self):
+        step1 = Step({"title": "test title", "description": "test description"})
+        step2 = Step({"title": "test title", "description": "test description 2"})
+        self.assertNotEqual(step1, step2)

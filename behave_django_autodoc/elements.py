@@ -86,3 +86,9 @@ class Step(object):
             "behave_django_autodoc", f"assets/step_{self.layout}.html").decode('utf-8')
         step_template = JinjaTemplate(step_string)
         return step_template.render(step=self, step_screenshot_base64=step_screenshot_base64)
+
+    def __eq__(self, other_step) -> bool:
+        for field in ["title", "description", "layout", "screenshot", "screenshot_time"]:
+            if getattr(self, field) != getattr(other_step, field):
+                return False
+        return True

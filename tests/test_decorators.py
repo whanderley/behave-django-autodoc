@@ -11,7 +11,9 @@ from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
 from behave_django_autodoc.decorators import BeforeFeatureDecorator
 from behave_django_autodoc.decorators import BeforeScenarioDecorator
+from behave_django_autodoc.decorators import BeforeStepDecorator
 from behave_django_autodoc.elements import Scenario
+from behave_django_autodoc.elements import Step
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -215,3 +217,17 @@ class TestAfterScenarioDecorator(unittest.TestCase):
         context = Mock()
         after_scenario_decorator(context, scenario)
         function.assert_called_once_with(context, scenario)
+
+
+class TestBeforeStepDecorator(unittest.TestCase):
+
+    def test_load_step_config_element(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_step_decorator = BeforeStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1"},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_config=scenario_config)
+        self.assertEqual(before_step_decorator.load_step_config_doc(context, step),
+                         Step({"title": "title1", "description": "description1"}))

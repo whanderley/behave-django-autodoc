@@ -7,6 +7,7 @@ import yaml
 
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
+from behave_django_autodoc.elements import Step
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -173,3 +174,12 @@ class AfterScenarioDecorator(BaseDecorator):
             scenario: behave scenario
         """
         self.function(context, scenario)
+
+
+class BeforeStepDecorator(BaseDecorator):
+
+    def load_step_config_doc(self, context, step):
+        """Load step config."""
+        for step_config in context.scenario_config['steps']:
+            if step_config['title'] == step.name:
+                return Step(step_config)
