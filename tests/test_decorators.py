@@ -5,6 +5,7 @@ from unittest.mock import Mock
 import yaml
 
 from behave_django_autodoc.decorators import AfterAllDecorator
+from behave_django_autodoc.decorators import AfterFeatureDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
 from behave_django_autodoc.decorators import BeforeFeatureDecorator
@@ -158,3 +159,14 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         function.assert_called_once_with(context, feature)
         context.html_doc_builder.add_feature.assert_called()
         self.assertEqual(context.feature_config, before_feature_decorator.load_feature_config.return_value)
+
+
+class TestAfterFeatureDecorator(unittest.TestCase):
+
+    def test_call(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        after_feature_decorator = AfterFeatureDecorator(function)
+        feature = Mock(filename="filename.feature")
+        context = Mock()
+        after_feature_decorator(context, feature)
+        function.assert_called_once_with(context, feature)

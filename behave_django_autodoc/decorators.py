@@ -119,3 +119,9 @@ class BeforeFeatureDecorator(BaseDecorator):
         Ignore scenarios and steps.
         """
         return {key: feature_dict[key] for key in feature_dict if key in ['title', 'description']}
+
+
+class AfterFeatureDecorator(BaseDecorator):
+
+    def __call__(self, context, feature):
+        self.function(context, feature)
