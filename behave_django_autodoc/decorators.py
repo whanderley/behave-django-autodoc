@@ -125,6 +125,12 @@ class BeforeFeatureDecorator(BaseDecorator):
 class AfterFeatureDecorator(BaseDecorator):
 
     def __call__(self, context, feature):
+        """
+        Call after_feature function.
+        fields:
+            context: behave context
+            feature: behave feature
+        """
         self.function(context, feature)
 
 
@@ -151,3 +157,19 @@ class BeforeScenarioDecorator(BaseDecorator):
         for scenario_config in context.feature_config['scenarios']:
             if scenario_config['title'] == scenario.name:
                 return Scenario(scenario_dict=scenario_config)
+
+
+class AfterScenarioDecorator(BaseDecorator):
+    """
+    Decorator to be used in after_scenario function.
+    """
+
+    def __call__(self, context, scenario):
+        """
+        Call after_scenario function.
+        Add scenario to html documentation.
+        fields:
+            context: behave context
+            scenario: behave scenario
+        """
+        self.function(context, scenario)

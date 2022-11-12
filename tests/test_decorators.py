@@ -6,6 +6,7 @@ import yaml
 
 from behave_django_autodoc.decorators import AfterAllDecorator
 from behave_django_autodoc.decorators import AfterFeatureDecorator
+from behave_django_autodoc.decorators import AfterScenarioDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
 from behave_django_autodoc.decorators import BeforeFeatureDecorator
@@ -203,3 +204,14 @@ class TestBeforeScenarioDecorator(unittest.TestCase):
         context.html_doc_builder.add_scenario.assert_called_once_with(
             before_scenario_decorator.load_scenario_config_doc.return_value)
         self.assertEqual(context.scenario_doc_config, before_scenario_decorator.load_scenario_config_doc.return_value)
+
+
+class TestAfterScenarioDecorator(unittest.TestCase):
+
+    def test_call(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        after_scenario_decorator = AfterScenarioDecorator(function)
+        scenario = Mock()
+        context = Mock()
+        after_scenario_decorator(context, scenario)
+        function.assert_called_once_with(context, scenario)
