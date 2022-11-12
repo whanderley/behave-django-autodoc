@@ -3,6 +3,8 @@ Module containing decorators to environmental controls from behave.
 """
 import os
 
+import yaml
+
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -101,3 +103,16 @@ class BeforeFeatureDecorator(BaseDecorator):
         if not os.path.exists(feature_config_file):
             raise FileNotFoundError(f'Feature config file not found: {feature_config_file}')
         return feature_config_file
+
+    def load_feature_config(self, feature):
+        """Load feature config."""
+        feature_config_path = self.get_feature_config_path(feature)
+        with open(feature_config_path, 'r') as feature_config_file:
+            return yaml.load(feature_config_file, Loader=yaml.FullLoader)
+
+    def extract_feature_config(self, feature_dict):
+        """
+        Extract feature config(title and description).
+        Ignore scenarios and steps.
+        """
+        return {key: feature_dict[key] for key in feature_dict if key in ['title', 'description']}

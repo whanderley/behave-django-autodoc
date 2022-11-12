@@ -2,6 +2,8 @@ import unittest
 from unittest import mock
 from unittest.mock import Mock
 
+import yaml
+
 from behave_django_autodoc.decorators import AfterAllDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
@@ -117,3 +119,23 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         before_feature_decorator.features_configs_dir = "features_configs_dir"
         with self.assertRaises(FileNotFoundError):
             before_feature_decorator.get_feature_config_path(feature)
+
+    @mock.patch('behave_django_autodoc.decorators.open')
+    @mock.patch('behave_django_autodoc.decorators.yaml.load')
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
+    def test_load_feature_config(self, mock_get_feature_config_path, mock_yaml_load, mock_open):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        feature = Mock(filename="filename.feature")
+        mock_get_feature_config_path.return_value = "config_path"
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        before_feature_decorator.load_feature_config(feature)
+        file_handle = mock_open.return_value.__enter__.return_value
+        mock_open.assert_called_once_with("config_path", "r")
+        mock_yaml_load.assert_called_once_with(file_handle, Loader=yaml.FullLoader)
+
+    def test_extract_feature_config(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        feature_dict = {"title": "feature", "description": "description", "scenarios": [{"scenario": "scenario"}]}
+        self.assertEqual(before_feature_decorator.extract_feature_config(feature_dict),
+                         {"title": "feature", "description": "description"})
