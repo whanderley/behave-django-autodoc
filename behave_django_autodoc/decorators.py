@@ -6,6 +6,7 @@ import os
 import yaml
 
 from behave_django_autodoc.elements import Feature
+from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -95,9 +96,9 @@ class BeforeFeatureDecorator(BaseDecorator):
             context: behave context
             feature: behave feature
         """
-        feature_config = self.load_feature_config(feature)
-        context.html_doc_builder.add_feature(Feature(feature_dict=self.extract_feature_config(feature_config)))
-        context.feature_config = feature_config
+        feature_doc_config = self.load_feature_config(feature)
+        context.html_doc_builder.add_feature(Feature(feature_dict=self.extract_feature_config(feature_doc_config)))
+        context.feature_doc_config = feature_doc_config
         self.function(context, feature)
 
     def get_feature_config_path(self, feature):
@@ -125,3 +126,28 @@ class AfterFeatureDecorator(BaseDecorator):
 
     def __call__(self, context, feature):
         self.function(context, feature)
+
+
+class BeforeScenarioDecorator(BaseDecorator):
+    """
+    Decorator to be used in before_scenario function.
+    """
+
+    def __call__(self, context, scenario):
+        """
+        Call before_scenario function.
+        Add scenario to html documentation.
+        fields:
+            context: behave context
+            scenario: behave scenario
+        """
+        scenario_doc_config = self.load_scenario_config_doc(context, scenario)
+        context.html_doc_builder.add_scenario(scenario_doc_config)
+        context.scenario_doc_config = scenario_doc_config
+        self.function(context, scenario)
+
+    def load_scenario_config_doc(self, context, scenario):
+        """Load scenario config."""
+        for scenario_config in context.feature_config['scenarios']:
+            if scenario_config['title'] == scenario.name:
+                return Scenario(scenario_dict=scenario_config)

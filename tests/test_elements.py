@@ -81,6 +81,11 @@ class TestScenario(unittest.TestCase):
         scenario = Scenario({"title": "test title", "description": "test description"}, steps=steps)
         self.assertEqual(scenario.steps, steps)
 
+    def test_equal(self):
+        scenario1 = Scenario({"title": "test title", "description": "test description"})
+        scenario2 = Scenario({"title": "test title", "description": "test description"})
+        self.assertEqual(scenario1, scenario2)
+
 
 class TestStep(unittest.TestCase):
     def test_init(self):

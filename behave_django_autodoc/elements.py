@@ -52,6 +52,9 @@ class Scenario(object):
         scenario_template = JinjaTemplate(scenario_string)
         return scenario_template.render(scenario=self)
 
+    def __eq__(self, other_scenario):
+        return self.title == other_scenario.title and self.description == other_scenario.description
+
 
 class Step(object):
     """

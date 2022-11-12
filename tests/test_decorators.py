@@ -9,6 +9,8 @@ from behave_django_autodoc.decorators import AfterFeatureDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
 from behave_django_autodoc.decorators import BeforeFeatureDecorator
+from behave_django_autodoc.decorators import BeforeScenarioDecorator
+from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -158,7 +160,7 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
             before_feature_decorator.load_feature_config.return_value)
         function.assert_called_once_with(context, feature)
         context.html_doc_builder.add_feature.assert_called()
-        self.assertEqual(context.feature_config, before_feature_decorator.load_feature_config.return_value)
+        self.assertEqual(context.feature_doc_config, before_feature_decorator.load_feature_config.return_value)
 
 
 class TestAfterFeatureDecorator(unittest.TestCase):
@@ -170,3 +172,34 @@ class TestAfterFeatureDecorator(unittest.TestCase):
         context = Mock()
         after_feature_decorator(context, feature)
         function.assert_called_once_with(context, feature)
+
+
+class TestBeforeScenarioDecorator(unittest.TestCase):
+
+    def test_load_scenario_config_element(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_scenario_decorator = BeforeScenarioDecorator(function)
+        scenario = Mock()
+        scenario.name = "title1"
+        feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
+                                        {"title": "title2", "description": "description2"}]}
+        context = Mock(feature_config=feature_config)
+        self.assertEqual(before_scenario_decorator.load_scenario_config_doc(context, scenario),
+                         Scenario({"title": "title1", "description": "description1"}))
+
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_scenario')
+    @mock.patch('behave_django_autodoc.decorators.BeforeScenarioDecorator.load_scenario_config_doc')
+    def test_call(self, mock_load_scenario_config_doc, mock_add_scenario):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_scenario_decorator = BeforeScenarioDecorator(function)
+        scenario = Mock()
+        scenario.name = "title1"
+        feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
+                                        {"title": "title2", "description": "description2"}]}
+        context = Mock(feature_config=feature_config)
+        before_scenario_decorator(context, scenario)
+        function.assert_called_once_with(context, scenario)
+        before_scenario_decorator.load_scenario_config_doc.assert_called_once_with(context, scenario)
+        context.html_doc_builder.add_scenario.assert_called_once_with(
+            before_scenario_decorator.load_scenario_config_doc.return_value)
+        self.assertEqual(context.scenario_doc_config, before_scenario_decorator.load_scenario_config_doc.return_value)
