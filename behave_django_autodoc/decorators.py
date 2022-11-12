@@ -77,3 +77,27 @@ class AfterAllDecorator(BaseDecorator):
         """
         context.html_doc_builder.save(self.docs_dir)
         self.function(context)
+
+
+class BeforeFeatureDecorator(BaseDecorator):
+    """
+    Decorator to be used in before_feature function.
+    """
+
+    def __call__(self, context, feature):
+        """
+        Call before_feature function.
+        Add feature to html documentation.
+        fields:
+            context: behave context
+            feature: behave feature
+        """
+        context.html_doc_builder.add_feature(feature)
+        self.function(context, feature)
+
+    def get_feature_config_path(self, feature):
+        """Return feature config path."""
+        feature_config_file = os.path.join(self.features_configs_dir, feature.filename.split('.')[0] + '.yaml')
+        if not os.path.exists(feature_config_file):
+            raise FileNotFoundError(f'Feature config file not found: {feature_config_file}')
+        return feature_config_file

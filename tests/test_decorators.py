@@ -5,6 +5,7 @@ from unittest.mock import Mock
 from behave_django_autodoc.decorators import AfterAllDecorator
 from behave_django_autodoc.decorators import BaseDecorator
 from behave_django_autodoc.decorators import BeforeAllDecorator
+from behave_django_autodoc.decorators import BeforeFeatureDecorator
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -89,3 +90,30 @@ class TestAfterAllDecorator(unittest.TestCase):
         after_all_decorator(context)
         function.assert_called_once_with(context)
         context.html_doc_builder.save.assert_called_once_with("enviroment_dir/behave_django_autodoc/docs")
+
+
+class TestBeforeFeatureDecorator(unittest.TestCase):
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.exists')
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.features_configs_dir', new_callable=mock.PropertyMock)
+    def test_get_feature_config_path(self, mock_features_configs_dir, mock_path_exists):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        feature = Mock(filename="filename.feature")
+        mock_path_exists.return_value = True
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        mock_features_configs_dir.return_value = "enviroment_dir/behave_django_autodoc/features_configs"
+        before_feature_decorator.features_configs_dir = "features_configs_dir"
+        self.assertEqual(before_feature_decorator.get_feature_config_path(feature),
+                         "enviroment_dir/behave_django_autodoc/features_configs/filename.yaml")
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.exists')
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.features_configs_dir', new_callable=mock.PropertyMock)
+    def test_raise_error_when_config_not_exist(self, mock_features_configs_dir, mock_file_exists):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        feature = Mock(filename="filename.feature")
+        mock_file_exists.return_value = False
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        mock_features_configs_dir.return_value = "enviroment_dir/behave_django_autodoc/features_configs"
+        before_feature_decorator.features_configs_dir = "features_configs_dir"
+        with self.assertRaises(FileNotFoundError):
+            before_feature_decorator.get_feature_config_path(feature)

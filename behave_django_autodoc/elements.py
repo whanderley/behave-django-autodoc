@@ -1,4 +1,6 @@
-"""Abstraction of the elements from the behave, like feature, scenario and step."""
+"""
+Abstraction of the elements from the behave, like feature, scenario and step.
+"""
 from jinja2 import Template as JinjaTemplate
 from pkg_resources import resource_string
 

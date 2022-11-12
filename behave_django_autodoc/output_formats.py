@@ -5,7 +5,9 @@ import os.path
 
 
 class OutputFormat(object):
-    """Class to save the documentation in formats like html, pdf"""
+    """
+    Class to save the documentation in formats like html, pdf
+    """
 
     def __init__(self, html_string: str, docs_dir: str, formats: list = None) -> None:
         self.html_string = html_string
