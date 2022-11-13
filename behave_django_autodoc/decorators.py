@@ -202,3 +202,30 @@ class BeforeStepDecorator(BaseDecorator):
         for step_config in context.scenario_config['steps']:
             if step_config['title'] == step.name:
                 return Step(step_config)
+
+
+class AfterStepDecorator(BaseDecorator):
+
+    def __call__(self, context, step):
+        """
+        Call after_step function.
+        Add step to html documentation if screenshot time is after.
+        fields:
+            context: behave context
+            step: behave step
+        """
+        step_doc_config = self.load_step_config_doc(context, step)
+        if step_doc_config.screenshot_time == 'after':
+            if step_doc_config.screenshot:
+                screenshot_path = os.path.join(self.images_dir, step_doc_config.title + '.jpg')
+                image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
+                context.html_doc_builder.add_step(step_doc_config, image64)
+            else:
+                context.html_doc_builder.add_step(step_doc_config)
+        self.function(context, step)
+
+    def load_step_config_doc(self, context, step):
+        """Load step config."""
+        for step_config in context.scenario_config['steps']:
+            if step_config['title'] == step.name:
+                return Step(step_config)
