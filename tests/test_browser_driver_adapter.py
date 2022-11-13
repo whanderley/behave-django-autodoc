@@ -32,11 +32,15 @@ class TestBrowserDriverSelenium(unittest.TestCase):
         browser_driver = BrowserDriver(browser)
         self.assertEqual(browser_driver.browser, browser)
 
-    def test_get_screenshot(self):
+    @unittest.mock.patch("behave_django_autodoc.browser_driver_adapter.base64")
+    @unittest.mock.patch("behave_django_autodoc.browser_driver_adapter.open")
+    def test_take_screenshot(self, mock_open, mock_base64):
         browser = Mock(__module__="selenium.webdriver.firefox.webdriver")
         browser.get_screenshot = MagicMock(return_value=True)
         browser_driver = BrowserDriver(browser)
-        browser_driver.get_screenshot("test.jpg")
+        mock_open.return_value.read.return_value = b"test"
+        mock_base64.b64encode.return_value.decode.return_value = "test"
+        self.assertEqual('data:image/jpeg;base64,test', browser_driver.take_screenshot("test.jpg"))
         browser.get_screenshot.assert_called_once_with("test.jpg")
 
     def test_execute_script(self):
@@ -63,11 +67,15 @@ class TestBrowserDriverSplinter(unittest.TestCase):
         browser_driver = BrowserDriver(browser)
         self.assertEqual(browser_driver.browser, browser)
 
-    def test_get_screenshot(self):
+    @unittest.mock.patch("behave_django_autodoc.browser_driver_adapter.base64")
+    @unittest.mock.patch("behave_django_autodoc.browser_driver_adapter.open")
+    def test_take_screenshot(self, mock_open, mock_base64):
         browser = Mock(__module__="splinter.driver.webdriver.firefox")
         browser.screenshot = MagicMock(return_value=True)
         browser_driver = BrowserDriver(browser)
-        browser_driver.get_screenshot("test.jpg")
+        mock_open.return_value.read.return_value = b"test"
+        mock_base64.b64encode.return_value.decode.return_value = "test"
+        self.assertEqual('data:image/jpeg;base64,test', browser_driver.take_screenshot("test.jpg"))
         browser.screenshot.assert_called_once_with("test.jpg")
 
     def test_execute_script(self):

@@ -5,6 +5,7 @@ import os
 
 import yaml
 
+from behave_django_autodoc.browser_driver_adapter import BrowserDriver
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.elements import Step
@@ -177,6 +178,24 @@ class AfterScenarioDecorator(BaseDecorator):
 
 
 class BeforeStepDecorator(BaseDecorator):
+
+    def __call__(self, context, step):
+        """
+        Call before_step function.
+        Add step to html documentation if screenshot time is before.
+        fields:
+            context: behave context
+            step: behave step
+        """
+        step_doc_config = self.load_step_config_doc(context, step)
+        if step_doc_config.screenshot_time == 'before':
+            if step_doc_config.screenshot:
+                screenshot_path = os.path.join(self.images_dir, step_doc_config.title + '.jpg')
+                image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
+                context.html_doc_builder.add_step(step_doc_config, image64)
+            else:
+                context.html_doc_builder.add_step(step_doc_config)
+        self.function(context, step)
 
     def load_step_config_doc(self, context, step):
         """Load step config."""

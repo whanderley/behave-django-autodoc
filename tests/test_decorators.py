@@ -231,3 +231,53 @@ class TestBeforeStepDecorator(unittest.TestCase):
         context = Mock(scenario_config=scenario_config)
         self.assertEqual(before_step_decorator.load_step_config_doc(context, step),
                          Step({"title": "title1", "description": "description1"}))
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.join')
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
+    def test_call_when_step_screenshot_time_is_after(self, mock_add_step, mock_os_path_join):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_step_decorator = BeforeStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "after"},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_config=scenario_config)
+        before_step_decorator(context, step)
+        mock_add_step.assert_not_called()
+        mock_os_path_join.assert_not_called()
+        function.assert_called_once_with(context, step)
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.join')
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
+    def test_call_when_step_screenshot_time_is_before_and_without_screenshot(self, mock_add_step, mock_os_path_join):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_step_decorator = BeforeStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1",
+                                      "screenshot_time": "before", "screenshot": False},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_config=scenario_config)
+        before_step_decorator(context, step)
+        step_config_doc = Step({"title": "title1", "description": "description1",
+                               "screenshot_time": "before", "screenshot": False})
+        context.html_doc_builder.add_step.assert_called_once_with(step_config_doc)
+        function.assert_called_once_with(context, step)
+
+    @mock.patch('behave_django_autodoc.decorators.BrowserDriver')
+    def test_call_when_step_screenshot_time_is_before_and_with_screenshot(self, mock_browser_driver):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_step_decorator = BeforeStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        mock_browser_driver.return_value.take_screenshot.return_value = "Image string base64"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "before"},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_config=scenario_config)
+        context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
+        before_step_decorator(context, step)
+        step_config_doc = Step({"title": "title1", "description": "description1",
+                               "screenshot_time": "before"})
+        context.html_doc_builder.add_step.assert_called_once_with(
+            step_config_doc, 'Image string base64')
+        function.assert_called_once_with(context, step)

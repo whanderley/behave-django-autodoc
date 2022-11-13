@@ -1,4 +1,7 @@
 # -*- coding: utf-8 -*-
+import base64
+
+
 class UnkownBrowserDriverException(Exception):
     """Exception raised when the browser driver is not supported"""
 
@@ -25,8 +28,9 @@ class BrowserDriverSelenium:
     def __init__(self, browser) -> None:
         self.browser = browser
 
-    def get_screenshot(self, filename):
+    def take_screenshot(self, filename):
         self.browser.get_screenshot(filename)
+        return 'data:image/jpeg;base64,' + base64.b64encode(open(filename, 'rb').read()).decode()
 
     def execute_script(self, script):
         self.browser.execute_script(script)
@@ -43,8 +47,9 @@ class BrowserDriverSplinter:
     def __init__(self, browser) -> None:
         self.browser = browser
 
-    def get_screenshot(self, filename):
+    def take_screenshot(self, filename):
         self.browser.screenshot(filename)
+        return 'data:image/jpeg;base64,' + base64.b64encode(open(filename, 'rb').read()).decode()
 
     def execute_script(self, script):
         self.browser.execute_script(script)
