@@ -17,10 +17,9 @@ class Feature(object):
         description: feature description(optional)
     """
 
-    def __init__(self, feature_dict: dict, scenarios: list = None) -> None:
+    def __init__(self, feature_dict: dict) -> None:
         self.title = feature_dict["title"]
         self.description = feature_dict.get("description", None)
-        self.scenarios = scenarios
 
     def to_html(self):
         """Generate the feature html"""
@@ -39,10 +38,9 @@ class Scenario(object):
         description: scenario description(optional)
     """
 
-    def __init__(self, scenario_dict: dict, steps: list = None) -> None:
+    def __init__(self, scenario_dict: dict) -> None:
         self.title = scenario_dict["title"]
         self.description = scenario_dict.get("description", None)
-        self.steps = steps
 
     def to_html(self):
         """Generate the scenario html"""
