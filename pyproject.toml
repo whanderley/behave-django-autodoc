@@ -6,8 +6,6 @@ authors = ["Whanderley Souza Freitas <whanderley.souza@iff.edu.br>"]
 
 [tool.poetry.dependencies]
 python = "^3.8"
-selenium = "^4.5.0"
-splinter = "^0.18.1"
 PyYAML = "^6.0"
 pytest-cov = "^4.0.0"
 Jinja2 = "^3.1.2"
