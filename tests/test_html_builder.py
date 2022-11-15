@@ -39,6 +39,20 @@ class TestHtmlBuilder(unittest.TestCase):
         mock_join.assert_called_with('images_dir', 'title2.jpg')
         self.assertIn("step string", html_builder.string)
 
+    @mock.patch('behave_django_autodoc.html_builder.os.path.join')
+    @mock.patch('behave_django_autodoc.html_builder.BrowserDriver')
+    def test_add_step_without_screenshot(self, mock_browser_driver, mock_join):
+        html_builder = HtmlBuilder()
+        step_config = {"steps": [{"title": "title1", "description": "description1",
+                                  "screenshot_time": "after", "screenshot": False},
+                                 {"title": "title2", "description": "description2"}]}
+        context = Mock(step_config=step_config)
+        context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
+        step = mock.Mock(to_html=mock.Mock(return_value="step string"), screenshot=False, title="title2")
+        html_builder.add_step(step, 'images_dir', context)
+        step.to_html.assert_called_with()
+        self.assertIn("step string", html_builder.string)
+
     @mock.patch('behave_django_autodoc.html_builder.resource_string')
     @mock.patch('behave_django_autodoc.html_builder.OutputFormat', autospec=True)
     def test_save(self, mock_output_format, mock_resource_string):

@@ -64,7 +64,7 @@ class TestBeforeAllDecorator(unittest.TestCase):
     @mock.patch('behave_django_autodoc.decorators.os.makedirs')
     @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir',
                 new_callable=mock.PropertyMock)
-    def create_docs_dir(self, mock_docs_dir, mock_makedirs):
+    def test_create_docs_dir(self, mock_docs_dir, mock_makedirs):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
         before_all_decorator = BeforeAllDecorator(function)
