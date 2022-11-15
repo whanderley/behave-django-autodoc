@@ -8,17 +8,17 @@ authors = ["Whanderley Souza Freitas <whanderley.souza@iff.edu.br>"]
 python = "^3.8"
 selenium = "^4.5.0"
 splinter = "^0.18.1"
-pylint = "^2.15.5"
-pre-commit = "^2.20.0"
-flake8 = "^5.0.4"
-black = "^22.10.0"
 PyYAML = "^6.0"
-mypy = "^0.982"
 pytest-cov = "^4.0.0"
 Jinja2 = "^3.1.2"
 pyaml = "^21.10.1"
 
 [tool.poetry.dev-dependencies]
+mypy = "^0.982"
+flake8 = "^5.0.4"
+pylint = "^2.15.5"
+pre-commit = "^2.20.0"
+black = "^22.10.0"
 pytest = "^5.2"
 ipdb = "^0.13.9"
 
