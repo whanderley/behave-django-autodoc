@@ -30,7 +30,7 @@ repos:
         name: pytest
         stages: [commit]
         language: system
-        entry: poetry run pytest -s -v
+        entry: poetry run pytest
         types: [python]
         pass_filenames: false
         always_run: true
@@ -38,7 +38,7 @@ repos:
         name: pytest-cov
         stages: [commit]
         language: system
-        entry: poetry run pytest --cov=behave_django_autodoc --cov-report=term-missing -s -v --cov-fail-under=90 tests/
+        entry: poetry run pytest --cov=behave_django_autodoc --cov-report=term-missing --cov-fail-under=90 tests/
         types: [python]
         pass_filenames: false
         always_run: true
@@ -46,7 +46,7 @@ repos:
        name: pytest-cov-html
        stages: [commit]
        language: system
-       entry: poetry run pytest --cov=behave_django_autodoc --cov-report=html -s -v --cov-fail-under=90 tests/
+       entry: poetry run pytest --cov=behave_django_autodoc --cov-report=html --cov-fail-under=90 tests/
        types: [python]
        pass_filenames: false
        always_run: true

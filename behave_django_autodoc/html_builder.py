@@ -1,8 +1,11 @@
 """
 Module to build the html string containing the documentation.
 """
+import os
+
 from pkg_resources import resource_string
 
+from behave_django_autodoc.browser_driver_adapter import BrowserDriver
 from behave_django_autodoc.output_formats import OutputFormat
 
 
@@ -29,12 +32,20 @@ class HtmlBuilder(object):
         """
         self.string += scenario.to_html()
 
-    def add_step(self, step):
+    def add_step(self, step, images_dir, context):
         """
         Add a step to the html string.
-        :param step: step object
+        :params
+            step: step object
+            images_dir: directory where the screenshots will be saved
+            context: behave context
         """
-        self.string += step.to_html()
+        if step.screenshot:
+            screenshot_path = os.path.join(images_dir, step.title + '.jpg')
+            image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
+            self.string += step.to_html(image64)
+        else:
+            self.string += step.to_html()
 
     def save(self, docs_dir):
         """

@@ -250,7 +250,7 @@ class TestBeforeStepDecorator(unittest.TestCase):
 
     @mock.patch('behave_django_autodoc.decorators.os.path.join')
     @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
-    def test_call_when_step_screenshot_time_is_before_and_without_screenshot(self, mock_add_step, mock_os_path_join):
+    def test_call_when_step_screenshot_time_is_before(self, mock_add_step, mock_os_path_join):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         before_step_decorator = BeforeStepDecorator(function)
         step = Mock()
@@ -262,25 +262,8 @@ class TestBeforeStepDecorator(unittest.TestCase):
         before_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot_time": "before", "screenshot": False})
-        context.html_doc_builder.add_step.assert_called_once_with(step_config_doc)
-        function.assert_called_once_with(context, step)
-
-    @mock.patch('behave_django_autodoc.decorators.BrowserDriver')
-    def test_call_when_step_screenshot_time_is_before_and_with_screenshot(self, mock_browser_driver):
-        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
-        before_step_decorator = BeforeStepDecorator(function)
-        step = Mock()
-        step.name = "title1"
-        mock_browser_driver.return_value.take_screenshot.return_value = "Image string base64"
-        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "before"},
-                                     {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
-        context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
-        before_step_decorator(context, step)
-        step_config_doc = Step({"title": "title1", "description": "description1",
-                               "screenshot_time": "before"})
         context.html_doc_builder.add_step.assert_called_once_with(
-            step_config_doc, 'Image string base64')
+            step_config_doc, before_step_decorator.images_dir, context)
         function.assert_called_once_with(context, step)
 
 
@@ -314,7 +297,7 @@ class TestAfterStepDecorator(unittest.TestCase):
 
     @mock.patch('behave_django_autodoc.decorators.os.path.join')
     @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
-    def test_call_when_step_screenshot_time_is_after_and_without_screenshot(self, mock_add_step, mock_os_path_join):
+    def test_call_when_step_screenshot_time_is_after(self, mock_add_step, mock_os_path_join):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         after_step_decorator = AfterStepDecorator(function)
         step = Mock()
@@ -326,23 +309,6 @@ class TestAfterStepDecorator(unittest.TestCase):
         after_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot_time": "after", "screenshot": False})
-        context.html_doc_builder.add_step.assert_called_once_with(step_config_doc)
-        function.assert_called_once_with(context, step)
-
-    @mock.patch('behave_django_autodoc.decorators.BrowserDriver')
-    def test_call_when_step_screenshot_time_is_after_and_with_screenshot(self, mock_browser_driver):
-        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
-        after_step_decorator = AfterStepDecorator(function)
-        step = Mock()
-        step.name = "title1"
-        mock_browser_driver.return_value.take_screenshot.return_value = "Image string base64"
-        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "after"},
-                                     {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
-        context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
-        after_step_decorator(context, step)
-        step_config_doc = Step({"title": "title1", "description": "description1",
-                               "screenshot_time": "after"})
-        context.html_doc_builder.add_step.assert_called_once_with(
-            step_config_doc, 'Image string base64')
+        context.html_doc_builder.add_step.assert_called_once_with(step_config_doc,
+                                                                  after_step_decorator.images_dir, context)
         function.assert_called_once_with(context, step)

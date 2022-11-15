@@ -5,7 +5,6 @@ import os
 
 import yaml
 
-from behave_django_autodoc.browser_driver_adapter import BrowserDriver
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.elements import Step
@@ -189,12 +188,7 @@ class BeforeStepDecorator(BaseDecorator):
         """
         step_doc_config = self.load_step_config_doc(context, step)
         if step_doc_config.screenshot_time == 'before':
-            if step_doc_config.screenshot:
-                screenshot_path = os.path.join(self.images_dir, step_doc_config.title + '.jpg')
-                image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
-                context.html_doc_builder.add_step(step_doc_config, image64)
-            else:
-                context.html_doc_builder.add_step(step_doc_config)
+            context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
     def load_step_config_doc(self, context, step):
@@ -216,12 +210,7 @@ class AfterStepDecorator(BaseDecorator):
         """
         step_doc_config = self.load_step_config_doc(context, step)
         if step_doc_config.screenshot_time == 'after':
-            if step_doc_config.screenshot:
-                screenshot_path = os.path.join(self.images_dir, step_doc_config.title + '.jpg')
-                image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
-                context.html_doc_builder.add_step(step_doc_config, image64)
-            else:
-                context.html_doc_builder.add_step(step_doc_config)
+            context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
     def load_step_config_doc(self, context, step):

@@ -1,5 +1,6 @@
 import unittest
 from unittest import mock
+from unittest.mock import Mock
 
 from behave_django_autodoc.html_builder import HtmlBuilder
 
@@ -22,9 +23,20 @@ class TestHtmlBuilder(unittest.TestCase):
         html_builder.add_scenario(mock.Mock(to_html=mock.Mock(return_value="scenario string")))
         self.assertIn("scenario string", html_builder.string)
 
-    def test_add_step(self):
+    @mock.patch('behave_django_autodoc.html_builder.os.path.join')
+    @mock.patch('behave_django_autodoc.html_builder.BrowserDriver')
+    def test_add_step_with_screenshot(self, mock_browser_driver, mock_join):
         html_builder = HtmlBuilder()
-        html_builder.add_step(mock.Mock(to_html=mock.Mock(return_value="step string")))
+        mock_browser_driver.return_value.take_screenshot.return_value = "Image string base64"
+        step_config = {"steps": [{"title": "title1", "description": "description1",
+                                  "screenshot_time": "after", "screenshot": False},
+                                 {"title": "title2", "description": "description2"}]}
+        context = Mock(step_config=step_config)
+        context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
+        step = mock.Mock(to_html=mock.Mock(return_value="step string"), screenshot=True, title="title2")
+        html_builder.add_step(step, 'images_dir', context)
+        step.to_html.assert_called_with('Image string base64')
+        mock_join.assert_called_with('images_dir', 'title2.jpg')
         self.assertIn("step string", html_builder.string)
 
     @mock.patch('behave_django_autodoc.html_builder.resource_string')
