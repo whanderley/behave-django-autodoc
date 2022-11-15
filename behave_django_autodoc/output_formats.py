@@ -19,7 +19,7 @@ class OutputFormat(object):
             'html': HtmlFormat
         }
         for output_format in self.formats:
-            output_format in class_formats and\
+            if output_format in class_formats:
                 class_formats[output_format](self.html_string, self.docs_dir).save()
 
 
@@ -28,6 +28,6 @@ class HtmlFormat(OutputFormat):
 
     def save(self) -> None:
         html_path = os.path.join(self.docs_dir, "doc.html")
-        html_doc = open(html_path, "w+")
+        html_doc = open(html_path, "w+", encoding="utf-8")
         html_doc.writelines(self.html_string)
         html_doc.close()

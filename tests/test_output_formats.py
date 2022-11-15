@@ -30,6 +30,6 @@ class TestHtmlFormat(unittest.TestCase):
         output_format = HtmlFormat(html_string="test html", docs_dir="dir/docs")
         output_format.save()
         mock_path.join.assert_called_with("dir/docs", "doc.html")
-        mock_open.assert_called_with("dir/docs/doc.html", "w+")
+        mock_open.assert_called_with("dir/docs/doc.html", "w+", encoding="utf-8")
         mock_open().writelines.assert_called_with("test html")
         mock_open().close.assert_called_with()
