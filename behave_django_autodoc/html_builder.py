@@ -55,5 +55,5 @@ class HtmlBuilder(object):
         self.string += resource_string(
            "behave_django_autodoc", "assets/final_html.html").decode('utf-8')
         self.string += resource_string(
-            "docme", "assets/doc.css").decode('utf-8') + "</style></html>"
+            "behave_django_autodoc", "assets/doc.css").decode('utf-8') + "</style></html>"
         OutputFormat(self.string, ['html'], docs_dir).save()

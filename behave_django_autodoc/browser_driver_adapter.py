@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 import base64
+from abc import ABC
+from abc import abstractmethod
 
 
 class UnkownBrowserDriverException(Exception):
@@ -22,11 +24,29 @@ class BrowserDriver(object):
         )
 
 
-class BrowserDriverSelenium:
-    """Browser driver for Selenium"""
+class BrowserDriverBase(ABC):
+    """
+    Abstract class for browser drivers. It defines the methods that must be implemented
+    """
 
     def __init__(self, browser) -> None:
         self.browser = browser
+
+    @abstractmethod
+    def take_screenshot(self, filename):
+        pass
+
+    @abstractmethod
+    def execute_script(self, script):
+        pass
+
+    @abstractmethod
+    def scroll_to_by_css(self, css_selector):
+        pass
+
+
+class BrowserDriverSelenium(BrowserDriverBase):
+    """Browser driver for Selenium"""
 
     def take_screenshot(self, filename):
         self.browser.get_screenshot(filename)
@@ -41,11 +61,8 @@ class BrowserDriverSelenium:
         )
 
 
-class BrowserDriverSplinter:
+class BrowserDriverSplinter(BrowserDriverBase):
     """Browser driver for Splinter"""
-
-    def __init__(self, browser) -> None:
-        self.browser = browser
 
     def take_screenshot(self, filename):
         self.browser.screenshot(filename)
