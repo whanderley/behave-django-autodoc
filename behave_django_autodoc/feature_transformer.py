@@ -1,8 +1,3 @@
-"""
-    Module to transform behave features to dict.
-"""
-
-
 class FeatureTransformer:
     """Class to transform behave features to dict"""
 

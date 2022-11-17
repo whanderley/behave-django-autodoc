@@ -127,17 +127,36 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             before_feature_decorator.get_feature_config_path(feature)
 
+    @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
     @mock.patch('behave_django_autodoc.decorators.open')
     @mock.patch('behave_django_autodoc.decorators.yaml.load')
     @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
-    def test_load_feature_config(self, mock_get_feature_config_path, mock_yaml_load, mock_open):
+    def test_load_feature_config(self, mock_get_feature_config_path, mock_yaml_load,
+                                 mock_open, mock_feature_to_dict):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         feature = Mock(filename="filename.feature")
         mock_get_feature_config_path.return_value = "config_path"
         before_feature_decorator = BeforeFeatureDecorator(function)
+        mock_feature_to_dict.return_value = {}
         before_feature_decorator.load_feature_config(feature)
         file_handle = mock_open.return_value.__enter__.return_value
-        mock_open.assert_called_once_with("config_path", "r")
+        mock_yaml_load.assert_called_once_with(file_handle, Loader=yaml.FullLoader)
+
+    @mock.patch('behave_django_autodoc.decorators.yaml.dump')
+    @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
+    @mock.patch('behave_django_autodoc.decorators.open')
+    @mock.patch('behave_django_autodoc.decorators.yaml.load')
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
+    def test_load_feature_config_when_file_not_exist(self, mock_get_feature_config_path, mock_yaml_load,
+                                                     mock_open, mock_feature_to_dict, mock_yaml_dump):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        feature = Mock(filename="filename.feature")
+        mock_get_feature_config_path.return_value = "config_path"
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        mock_feature_to_dict.return_value = {}
+        before_feature_decorator.load_feature_config(feature)
+        file_handle = mock_open.return_value.__enter__.return_value
+        mock_yaml_dump.assert_called_once_with({}, file_handle, default_flow_style=False)
         mock_yaml_load.assert_called_once_with(file_handle, Loader=yaml.FullLoader)
 
     def test_extract_feature_config(self):

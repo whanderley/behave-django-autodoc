@@ -8,6 +8,7 @@ import yaml
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
 from behave_django_autodoc.elements import Step
+from behave_django_autodoc.feature_transformer import FeatureTransformer
 from behave_django_autodoc.html_builder import HtmlBuilder
 
 
@@ -112,6 +113,9 @@ class BeforeFeatureDecorator(BaseDecorator):
     def load_feature_config(self, feature):
         """Load feature config."""
         feature_config_path = self.get_feature_config_path(feature)
+        if not os.path.exists(feature_config_path):
+            with open(feature_config_path, 'w') as outfile:
+                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
         with open(feature_config_path, 'r') as feature_config_file:
             return yaml.load(feature_config_file, Loader=yaml.FullLoader)
 
