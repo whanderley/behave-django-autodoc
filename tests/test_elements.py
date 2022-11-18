@@ -53,6 +53,15 @@ class TestScenario(unittest.TestCase):
         self.assertEqual(scenario.title, "test title")
         self.assertEqual(scenario.description, None)
 
+    def test_join_description(self):
+        scenario = Scenario(
+            {
+                "title": "test title",
+                "description": ["test", "description"],
+            }
+        )
+        self.assertEqual(scenario.description, "test description")
+
     def test_to_html(self):
         expected_html = """
         <h3 class="scenario-title"> test title </h3>

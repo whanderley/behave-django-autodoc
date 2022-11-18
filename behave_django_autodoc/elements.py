@@ -41,6 +41,8 @@ class Scenario(object):
     def __init__(self, scenario_dict: dict) -> None:
         self.title = scenario_dict["title"]
         self.description = scenario_dict.get("description", None)
+        if isinstance(self.description, list):
+            self.description = " ".join(self.description)
 
     def to_html(self):
         """Generate the scenario html"""
@@ -78,9 +80,6 @@ class Step(object):
         self.description = step_dict.get("description", None)
         for attribute, default_value in self.DEFAULT_STEP_CONFIG.items():
             setattr(self, attribute, step_dict.get(attribute, default_value))
-        self.layout = step_dict.get("layout", "vertical")
-        self.screenshot = step_dict.get("screenshot", True)
-        self.screenshot_time = step_dict.get("screenshot_time", "after")
         if self.layout not in ["vertical", "horizontal"]:
             raise ValueError(f"Invalid layout: {self.layout}")
         if self.screenshot_time not in ["before", "after"]:
