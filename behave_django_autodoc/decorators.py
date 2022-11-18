@@ -57,12 +57,17 @@ class BeforeAllDecorator(BaseDecorator):
             context: behave context
         """
         self.create_docs_dir()
+        self.create_images_dir()
         context.html_doc_builder = self.initialize_html_documentation()
         self.function(context)
 
     def create_docs_dir(self):
         """Create or replace docs directory."""
         os.makedirs(self.docs_dir, exist_ok=True)
+
+    def create_images_dir(self):
+        """Create or replace images directory."""
+        os.makedirs(self.images_dir, exist_ok=True)
 
     def initialize_html_documentation(self):
         """Initialize html documentation."""
@@ -105,7 +110,11 @@ class BeforeFeatureDecorator(BaseDecorator):
 
     def get_feature_config_path(self, feature):
         """Return feature config path."""
-        feature_config_file = os.path.join(self.features_configs_dir, feature.filename.split('.')[0] + '.yaml')
+        feature_config_file = os.path.join(self.features_configs_dir,
+                                           os.path.basename(feature.filename).split('.')[0] + '.yaml')
+        if not os.path.exists(feature_config_file):
+            with open(feature_config_file, 'w+') as outfile:
+                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
         if not os.path.exists(feature_config_file):
             raise FileNotFoundError(f'Feature config file not found: {feature_config_file}')
         return feature_config_file
@@ -153,15 +162,15 @@ class BeforeScenarioDecorator(BaseDecorator):
             scenario: behave scenario
         """
         scenario_doc_config = self.load_scenario_config_doc(context, scenario)
-        context.html_doc_builder.add_scenario(scenario_doc_config)
+        context.html_doc_builder.add_scenario(Scenario(scenario_dict=scenario_doc_config))
         context.scenario_doc_config = scenario_doc_config
         self.function(context, scenario)
 
     def load_scenario_config_doc(self, context, scenario):
         """Load scenario config."""
-        for scenario_config in context.feature_config['scenarios']:
+        for scenario_config in context.feature_doc_config['scenarios']:
             if scenario_config['title'] == scenario.name:
-                return Scenario(scenario_dict=scenario_config)
+                return scenario_config
 
 
 class AfterScenarioDecorator(BaseDecorator):
@@ -195,9 +204,9 @@ class BeforeStepDecorator(BaseDecorator):
             context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
-    def load_step_config_doc(self, context, step):
+    def load_step_config_doc(self, _context, step):
         """Load step config."""
-        for step_config in context.scenario_config['steps']:
+        for step_config in _context.scenario_doc_config['steps']:
             if step_config['title'] == step.name:
                 return Step(step_config)
 
@@ -217,8 +226,8 @@ class AfterStepDecorator(BaseDecorator):
             context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
-    def load_step_config_doc(self, context, step):
+    def load_step_config_doc(self, _context, step):
         """Load step config."""
-        for step_config in context.scenario_config['steps']:
+        for step_config in _context.scenario_doc_config['steps']:
             if step_config['title'] == step.name:
                 return Step(step_config)

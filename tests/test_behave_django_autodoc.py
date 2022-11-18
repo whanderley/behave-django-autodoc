@@ -7,7 +7,7 @@ from behave_django_autodoc import decorator_for_function
 
 
 def test_version():
-    assert __version__ == "0.1.0"
+    assert __version__ == "0.1.1"
 
 
 class TestAutoDoc(unittest.TestCase):

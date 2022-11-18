@@ -25,7 +25,7 @@ class Feature(object):
         """Generate the feature html"""
 
         feature_string = resource_string(
-            "behave_django_autodoc", "assets/feature.html").decode('utf-8')
+            __name__, "assets/feature.html").decode('utf-8')
         feature_template = JinjaTemplate(feature_string)
         return feature_template.render(feature=self)
 
@@ -46,7 +46,7 @@ class Scenario(object):
         """Generate the scenario html"""
 
         scenario_string = resource_string(
-            "behave_django_autodoc", "assets/scenario.html").decode('utf-8')
+            __name__, "assets/scenario.html").decode('utf-8')
         scenario_template = JinjaTemplate(scenario_string)
         return scenario_template.render(scenario=self)
 
@@ -81,7 +81,7 @@ class Step(object):
         if self.screenshot and not step_screenshot_base64:
             raise ScreenShotError("Screenshot base64 not found")
         step_string = resource_string(
-            "behave_django_autodoc", f"assets/step_{self.layout}.html").decode('utf-8')
+            __name__, f"assets/step_{self.layout}.html").decode('utf-8')
         step_template = JinjaTemplate(step_string)
         return step_template.render(step=self, step_screenshot_base64=step_screenshot_base64)
 

@@ -65,7 +65,7 @@ class BrowserDriverSplinter(BrowserDriverBase):
     """Browser driver for Splinter"""
 
     def take_screenshot(self, filename):
-        self.browser.screenshot(filename)
+        filename = self.browser.screenshot(filename)
         return 'data:image/jpeg;base64,' + base64.b64encode(open(filename, 'rb').read()).decode()
 
     def execute_script(self, script):

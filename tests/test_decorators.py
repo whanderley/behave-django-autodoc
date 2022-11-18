@@ -206,9 +206,9 @@ class TestBeforeScenarioDecorator(unittest.TestCase):
         scenario.name = "title1"
         feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
                                         {"title": "title2", "description": "description2"}]}
-        context = Mock(feature_config=feature_config)
+        context = Mock(feature_doc_config=feature_config)
         self.assertEqual(before_scenario_decorator.load_scenario_config_doc(context, scenario),
-                         Scenario({"title": "title1", "description": "description1"}))
+                         {"title": "title1", "description": "description1"})
 
     @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_scenario')
     @mock.patch('behave_django_autodoc.decorators.BeforeScenarioDecorator.load_scenario_config_doc')
@@ -219,12 +219,12 @@ class TestBeforeScenarioDecorator(unittest.TestCase):
         scenario.name = "title1"
         feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
                                         {"title": "title2", "description": "description2"}]}
-        context = Mock(feature_config=feature_config)
+        context = Mock(feature_doc_config=feature_config)
         before_scenario_decorator(context, scenario)
         function.assert_called_once_with(context, scenario)
         before_scenario_decorator.load_scenario_config_doc.assert_called_once_with(context, scenario)
         context.html_doc_builder.add_scenario.assert_called_once_with(
-            before_scenario_decorator.load_scenario_config_doc.return_value)
+            Scenario(before_scenario_decorator.load_scenario_config_doc.return_value))
         self.assertEqual(context.scenario_doc_config, before_scenario_decorator.load_scenario_config_doc.return_value)
 
 
@@ -248,7 +248,7 @@ class TestBeforeStepDecorator(unittest.TestCase):
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1"},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         self.assertEqual(before_step_decorator.load_step_config_doc(context, step),
                          Step({"title": "title1", "description": "description1"}))
 
@@ -261,7 +261,7 @@ class TestBeforeStepDecorator(unittest.TestCase):
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "after"},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         before_step_decorator(context, step)
         mock_add_step.assert_not_called()
         mock_os_path_join.assert_not_called()
@@ -277,7 +277,7 @@ class TestBeforeStepDecorator(unittest.TestCase):
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
                                       "screenshot_time": "before", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         before_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot_time": "before", "screenshot": False})
@@ -295,7 +295,7 @@ class TestAfterStepDecorator(unittest.TestCase):
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1"},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         self.assertEqual(after_step_decorator.load_step_config_doc(context, step),
                          Step({"title": "title1", "description": "description1"}))
 
@@ -308,7 +308,7 @@ class TestAfterStepDecorator(unittest.TestCase):
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "before"},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         after_step_decorator(context, step)
         mock_add_step.assert_not_called()
         mock_os_path_join.assert_not_called()
@@ -324,7 +324,7 @@ class TestAfterStepDecorator(unittest.TestCase):
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
                                       "screenshot_time": "after", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config)
         after_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot_time": "after", "screenshot": False})

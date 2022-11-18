@@ -16,7 +16,7 @@ class HtmlBuilder(object):
 
     def __init__(self):
         self.string = resource_string(
-            "behave_django_autodoc", "assets/initial_html.html").decode('utf-8')
+            __name__, "assets/initial_html.html").decode('utf-8')
 
     def add_feature(self, feature):
         """
@@ -41,7 +41,7 @@ class HtmlBuilder(object):
             context: behave context
         """
         if step.screenshot:
-            screenshot_path = os.path.join(images_dir, step.title + '.jpg')
+            screenshot_path = os.path.join(images_dir, step.title)
             image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
             self.string += step.to_html(image64)
         else:
@@ -53,7 +53,7 @@ class HtmlBuilder(object):
         :param docs_dir: directory where the documentation will be saved
         """
         self.string += resource_string(
-           "behave_django_autodoc", "assets/final_html.html").decode('utf-8')
+           __name__, "assets/final_html.html").decode('utf-8')
         self.string += resource_string(
-            "behave_django_autodoc", "assets/doc.css").decode('utf-8') + "</style></html>"
-        OutputFormat(self.string, ['html'], docs_dir).save()
+            __name__, "assets/doc.css").decode('utf-8') + "</style></html>"
+        OutputFormat(self.string, docs_dir, ['html']).save()

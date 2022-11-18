@@ -3,7 +3,7 @@
 from behave_django_autodoc.decorators import *
 
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 
 def auto_doc(dict_functions):
@@ -15,7 +15,9 @@ def auto_doc(dict_functions):
         if func in dict_functions:
             dict_functions[func] = decorator(dict_functions[func])
         else:
-            dict_functions[func] = decorator(lambda *args: None)
+            fake_function = lambda *args: None
+            fake_function.__globals__["__file__"] = dict_functions["__file__"]
+            dict_functions[func] = decorator(fake_function)
 
 
 def decorator_for_function(function_name):

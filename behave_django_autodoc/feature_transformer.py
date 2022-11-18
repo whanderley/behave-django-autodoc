@@ -7,10 +7,10 @@ class FeatureTransformer:
     def steps_to_dict(self, steps):
         """Transform a behave step to dict"""
         steps_dict = []
-        for step in steps:
+        for _step in steps:
             steps_dict.append({
-                'title': step.name,
-                'description': step.text
+                'title': _step.name,
+                'description': _step.text and _step.text.replace('\n', '')
             })
         return steps_dict
 
@@ -20,7 +20,7 @@ class FeatureTransformer:
         for scenario in scenarios:
             scenarios_dict.append({
                 'title': scenario.name,
-                'description': scenario.description,
+                'description': ''.join(scenario.description),
                 'steps': self.steps_to_dict(scenario.steps)
             })
         return scenarios_dict
