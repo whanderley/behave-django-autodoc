@@ -233,7 +233,7 @@ class TestStep(unittest.TestCase):
                 "description": "test description",
                 "layout": "vertical",
                 "screenshot": True,
-                "no_title": True,
+                "no-title": True,
             }
         )
         html = step.to_html(step_screenshot_base64='screenshot_base64')
@@ -246,11 +246,25 @@ class TestStep(unittest.TestCase):
                 "description": "test description",
                 "layout": "horizontal",
                 "screenshot": True,
-                "no_title": True,
+                "no-title": True,
             }
         )
         html = step.to_html(step_screenshot_base64='screenshot_base64')
         self.assertNotIn('step-title', html)
+
+    def test_to_html_with_no_doc_return_empty_string(self):
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "horizontal",
+                "screenshot": True,
+                "no_title": True,
+                "no-doc": True,
+            }
+        )
+        html = step.to_html(step_screenshot_base64='screenshot_base64')
+        self.assertEqual(html, '')
 
     def test_step_screenshot_base64_is_mandatory_when_screenshot_is_true(self):
         with self.assertRaises(ScreenShotError):

@@ -65,21 +65,22 @@ class Step(object):
         layout: step layout, vertical or horizontal(optional, default vertical)
         screenshot: configure if the step should have a screenshot(optional, default True)
         screenshot_time: when to take the screenshot, before or after the step(optional, default after)
-        no_title: configure if the step should have a show the title on doc(optional, default False)
+        no-title: configure if the step should have a show the title on doc(optional, default False)
     """
 
     DEFAULT_STEP_CONFIG = {
         'layout': 'vertical',
         'screenshot': True,
         'screenshot_time': 'after',
-        'no_title': False,
+        'no-title': False,
+        'no-doc': False
     }
 
     def __init__(self, step_dict: dict) -> None:
         self.title = step_dict["title"]
         self.description = step_dict.get("description", None)
         for attribute, default_value in self.DEFAULT_STEP_CONFIG.items():
-            setattr(self, attribute, step_dict.get(attribute, default_value))
+            setattr(self, attribute.replace('-', '_'), step_dict.get(attribute, default_value))
         if self.layout not in ["vertical", "horizontal"]:
             raise ValueError(f"Invalid layout: {self.layout}")
         if self.screenshot_time not in ["before", "after"]:
@@ -87,6 +88,8 @@ class Step(object):
 
     def to_html(self, step_screenshot_base64: str = None) -> str:
         """Generate the step html"""
+        if self.no_doc:
+            return ''
         if self.screenshot and not step_screenshot_base64:
             raise ScreenShotError("Screenshot base64 not found")
         step_string = resource_string(
