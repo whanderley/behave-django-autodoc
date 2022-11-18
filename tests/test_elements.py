@@ -115,6 +115,10 @@ class TestStep(unittest.TestCase):
         with self.assertRaises(ValueError):
             Step({"title": "test title", "screenshot_time": "invalid"})
 
+    def test_no_title_by_default_is_false(self):
+        step = Step({"title": "test title"})
+        self.assertFalse(step.no_title)
+
     def test_without_screen_shot(self):
         step = Step({"title": "test title", "screenshot": False})
         self.assertFalse(step.screenshot)
@@ -212,6 +216,32 @@ class TestStep(unittest.TestCase):
         )
         html = step.to_html(step_screenshot_base64='screenshot_base64')
         self.assertEqual(_strip_whitespace(html), _strip_whitespace(expected_html))
+
+    def test_to_html_with_no_title_vertical_layout(self):
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "vertical",
+                "screenshot": True,
+                "no_title": True,
+            }
+        )
+        html = step.to_html(step_screenshot_base64='screenshot_base64')
+        self.assertNotIn('step-title', html)
+
+    def test_to_html_with_no_title_horizontal_layout(self):
+        step = Step(
+            {
+                "title": "test title",
+                "description": "test description",
+                "layout": "horizontal",
+                "screenshot": True,
+                "no_title": True,
+            }
+        )
+        html = step.to_html(step_screenshot_base64='screenshot_base64')
+        self.assertNotIn('step-title', html)
 
     def test_step_screenshot_base64_is_mandatory_when_screenshot_is_true(self):
         with self.assertRaises(ScreenShotError):

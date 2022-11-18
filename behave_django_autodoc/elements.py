@@ -63,12 +63,14 @@ class Step(object):
         layout: step layout, vertical or horizontal(optional, default vertical)
         screenshot: configure if the step should have a screenshot(optional, default True)
         screenshot_time: when to take the screenshot, before or after the step(optional, default after)
+        no_title: configure if the step should have a show the title on doc(optional, default False)
     """
 
     DEFAULT_STEP_CONFIG = {
         'layout': 'vertical',
         'screenshot': True,
-        'screenshot_time': 'after'
+        'screenshot_time': 'after',
+        'no_title': False,
     }
 
     def __init__(self, step_dict: dict) -> None:

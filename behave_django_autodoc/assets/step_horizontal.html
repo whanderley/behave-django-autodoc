@@ -4,7 +4,9 @@
     {% endif %}
     <div class="col-6">
         <span class="align-middle">
-            <p class=step-title>{{ step.title }}</p>
+            {% if not step.no_title %}
+                <p class=step-title>{{ step.title }}</p>
+            {% endif %}
             <p class="step-description">{{ step.description or ' ' }}</p>
         </span>
     </div>
