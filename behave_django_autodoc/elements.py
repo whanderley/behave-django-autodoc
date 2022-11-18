@@ -65,9 +65,17 @@ class Step(object):
         screenshot_time: when to take the screenshot, before or after the step(optional, default after)
     """
 
+    DEFAULT_STEP_CONFIG = {
+        'layout': 'vertical',
+        'screenshot': True,
+        'screenshot_time': 'after'
+    }
+
     def __init__(self, step_dict: dict) -> None:
         self.title = step_dict["title"]
         self.description = step_dict.get("description", None)
+        for attribute, default_value in self.DEFAULT_STEP_CONFIG.items():
+            setattr(self, attribute, step_dict.get(attribute, default_value))
         self.layout = step_dict.get("layout", "vertical")
         self.screenshot = step_dict.get("screenshot", True)
         self.screenshot_time = step_dict.get("screenshot_time", "after")
