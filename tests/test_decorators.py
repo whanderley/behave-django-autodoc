@@ -259,7 +259,7 @@ class TestBeforeStepDecorator(unittest.TestCase):
         before_step_decorator = BeforeStepDecorator(function)
         step = Mock()
         step.name = "title1"
-        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "after"},
+        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot-time": "after"},
                                      {"title": "title2", "description": "description2"}]}
         context = Mock(scenario_doc_config=scenario_config)
         before_step_decorator(context, step)
@@ -275,12 +275,12 @@ class TestBeforeStepDecorator(unittest.TestCase):
         step = Mock()
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
-                                      "screenshot_time": "before", "screenshot": False},
+                                      "screenshot-time": "before", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
         context = Mock(scenario_doc_config=scenario_config)
         before_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
-                               "screenshot_time": "before", "screenshot": False})
+                               "screenshot-time": "before", "screenshot": False})
         context.html_doc_builder.add_step.assert_called_once_with(
             step_config_doc, before_step_decorator.images_dir, context)
         function.assert_called_once_with(context, step)
@@ -306,7 +306,7 @@ class TestAfterStepDecorator(unittest.TestCase):
         after_step_decorator = AfterStepDecorator(function)
         step = Mock()
         step.name = "title1"
-        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot_time": "before"},
+        scenario_config = {"steps": [{"title": "title1", "description": "description1", "screenshot-time": "before"},
                                      {"title": "title2", "description": "description2"}]}
         context = Mock(scenario_doc_config=scenario_config)
         after_step_decorator(context, step)
@@ -322,12 +322,12 @@ class TestAfterStepDecorator(unittest.TestCase):
         step = Mock()
         step.name = "title1"
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
-                                      "screenshot_time": "after", "screenshot": False},
+                                      "screenshot-time": "after", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
         context = Mock(scenario_doc_config=scenario_config)
         after_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
-                               "screenshot_time": "after", "screenshot": False})
+                               "screenshot-time": "after", "screenshot": False})
         context.html_doc_builder.add_step.assert_called_once_with(step_config_doc,
                                                                   after_step_decorator.images_dir, context)
         function.assert_called_once_with(context, step)

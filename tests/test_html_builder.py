@@ -29,7 +29,7 @@ class TestHtmlBuilder(unittest.TestCase):
         html_builder = HtmlBuilder()
         mock_browser_driver.return_value.take_screenshot.return_value = "Image string base64"
         step_config = {"steps": [{"title": "title1", "description": "description1",
-                                  "screenshot_time": "after", "screenshot": False},
+                                  "screenshot-time": "after", "screenshot": False},
                                  {"title": "title2", "description": "description2"}]}
         context = Mock(step_config=step_config)
         context.browser = Mock(__module__="splinter.driver.webdriver.firefox")
@@ -44,7 +44,7 @@ class TestHtmlBuilder(unittest.TestCase):
     def test_add_step_without_screenshot(self, mock_browser_driver, mock_join):
         html_builder = HtmlBuilder()
         step_config = {"steps": [{"title": "title1", "description": "description1",
-                                  "screenshot_time": "after", "screenshot": False},
+                                  "screenshot-time": "after", "screenshot": False},
                                  {"title": "title2", "description": "description2"}]}
         context = Mock(step_config=step_config)
         context.browser = Mock(__module__="splinter.driver.webdriver.firefox")

@@ -113,7 +113,7 @@ class TestStep(unittest.TestCase):
             Step({"title": "test title", "layout": "invalid"})
 
     def test_screenshot_time(self):
-        step = Step({"title": "test title", "screenshot_time": "after"})
+        step = Step({"title": "test title", "screenshot-time": "after"})
         self.assertEqual(step.screenshot_time, "after")
 
     def test_by_default_screenshot_time_after(self):
@@ -122,7 +122,7 @@ class TestStep(unittest.TestCase):
 
     def test_not_accept_invalid_screenshot_time(self):
         with self.assertRaises(ValueError):
-            Step({"title": "test title", "screenshot_time": "invalid"})
+            Step({"title": "test title", "screenshot-time": "invalid"})
 
     def test_no_title_by_default_is_false(self):
         step = Step({"title": "test title"})
