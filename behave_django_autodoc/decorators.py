@@ -20,8 +20,9 @@ class BaseDecorator(object):
         function: function to be decorated
     """
 
-    def __init__(self, function):
+    def __init__(self, function, generate_docs_configs=False):
         self.function = function
+        self.generate_docs_configs = generate_docs_configs
 
     @property
     def behave_django_autodoc_dir(self):
@@ -56,8 +57,10 @@ class BeforeAllDecorator(BaseDecorator):
         fields:
             context: behave context
         """
+        context.generate_docs_configs = self.generate_docs_configs
         self.create_docs_dir()
         self.create_images_dir()
+        self.create_features_configs_dir()
         context.html_doc_builder = self.initialize_html_documentation()
         self.function(context)
 
@@ -68,6 +71,10 @@ class BeforeAllDecorator(BaseDecorator):
     def create_images_dir(self):
         """Create or replace images directory."""
         os.makedirs(self.images_dir, exist_ok=True)
+
+    def create_features_configs_dir(self):
+        """Create or replace features_configs directory."""
+        os.makedirs(self.features_configs_dir, exist_ok=True)
 
     def initialize_html_documentation(self):
         """Initialize html documentation."""
@@ -86,7 +93,8 @@ class AfterAllDecorator(BaseDecorator):
         fields:
             context: behave context
         """
-        context.html_doc_builder.save(self.docs_dir)
+        if not context.generate_docs_configs:
+            context.html_doc_builder.save(self.docs_dir)
         self.function(context)
 
 
@@ -103,28 +111,32 @@ class BeforeFeatureDecorator(BaseDecorator):
             context: behave context
             feature: behave feature
         """
-        feature_doc_config = self.load_feature_config(feature)
-        context.html_doc_builder.add_feature(Feature(feature_dict=self.extract_feature_config(feature_doc_config)))
-        context.feature_doc_config = feature_doc_config
+        if context.generate_docs_configs:
+            self.create_feature_config(self.get_feature_config_path(feature), feature)
+            feature.skip()
+        else:
+            feature_doc_config = self.load_feature_config(feature)
+            context.html_doc_builder.add_feature(Feature(feature_dict=self.extract_feature_config(feature_doc_config)))
+            context.feature_doc_config = feature_doc_config
         self.function(context, feature)
+
+    def create_feature_config(self, feature_config_path, feature):
+        """Create feature config."""
+        if not os.path.exists(feature_config_path):
+            with open(feature_config_path, 'w+') as outfile:
+                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
 
     def get_feature_config_path(self, feature):
         """Return feature config path."""
         feature_config_file = os.path.join(self.features_configs_dir,
                                            os.path.basename(feature.filename).split('.')[0] + '.yaml')
-        if not os.path.exists(feature_config_file):
-            with open(feature_config_file, 'w+') as outfile:
-                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
-        if not os.path.exists(feature_config_file):
-            raise FileNotFoundError(f'Feature config file not found: {feature_config_file}')
         return feature_config_file
 
     def load_feature_config(self, feature):
         """Load feature config."""
         feature_config_path = self.get_feature_config_path(feature)
         if not os.path.exists(feature_config_path):
-            with open(feature_config_path, 'w') as outfile:
-                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
+            raise FileNotFoundError(f'Feature config file not found: {feature_config_path}')
         with open(feature_config_path, 'r') as feature_config_file:
             return yaml.load(feature_config_file, Loader=yaml.FullLoader)
 
@@ -161,9 +173,10 @@ class BeforeScenarioDecorator(BaseDecorator):
             context: behave context
             scenario: behave scenario
         """
-        scenario_doc_config = self.load_scenario_config_doc(context, scenario)
-        context.html_doc_builder.add_scenario(Scenario(scenario_dict=scenario_doc_config))
-        context.scenario_doc_config = scenario_doc_config
+        if not context.generate_docs_configs:
+            scenario_doc_config = self.load_scenario_config_doc(context, scenario)
+            context.html_doc_builder.add_scenario(Scenario(scenario_dict=scenario_doc_config))
+            context.scenario_doc_config = scenario_doc_config
         self.function(context, scenario)
 
     def load_scenario_config_doc(self, context, scenario):
@@ -199,9 +212,10 @@ class BeforeStepDecorator(BaseDecorator):
             context: behave context
             step: behave step
         """
-        step_doc_config = self.load_step_config_doc(context, step)
-        if step_doc_config.screenshot_time == 'before':
-            context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
+        if not context.generate_docs_configs:
+            step_doc_config = self.load_step_config_doc(context, step)
+            if step_doc_config.screenshot_time == 'before':
+                context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
     def load_step_config_doc(self, _context, step):
@@ -221,9 +235,10 @@ class AfterStepDecorator(BaseDecorator):
             context: behave context
             step: behave step
         """
-        step_doc_config = self.load_step_config_doc(context, step)
-        if step_doc_config.screenshot_time == 'after':
-            context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
+        if not context.generate_docs_configs:
+            step_doc_config = self.load_step_config_doc(context, step)
+            if step_doc_config.screenshot_time == 'after':
+                context.html_doc_builder.add_step(step_doc_config, self.images_dir, context)
         self.function(context, step)
 
     def load_step_config_doc(self, _context, step):

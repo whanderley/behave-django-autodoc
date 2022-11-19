@@ -87,6 +87,13 @@ class TestBeforeAllDecorator(unittest.TestCase):
         function.assert_called_once_with(context)
         self.assertEqual(context.html_doc_builder.__class__, HtmlBuilder)
 
+    def test_call_to_generate_configs(self):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_all_decorator = BeforeAllDecorator(function, True)
+        context = Mock(generate_docs_configs=False)
+        before_all_decorator(context)
+        self.assertTrue(context.generate_docs_configs)
+
 
 class TestAfterAllDecorator(unittest.TestCase):
 
@@ -94,11 +101,19 @@ class TestAfterAllDecorator(unittest.TestCase):
     def test_call(self, mock_docs_dir):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         after_all_decorator = AfterAllDecorator(function)
-        context = Mock()
+        context = Mock(generate_docs_configs=False)
         mock_docs_dir.return_value = "enviroment_dir/behave_django_autodoc/docs"
         after_all_decorator(context)
         function.assert_called_once_with(context)
         context.html_doc_builder.save.assert_called_once_with("enviroment_dir/behave_django_autodoc/docs")
+
+    @mock.patch('behave_django_autodoc.decorators.BaseDecorator.docs_dir',  new_callable=mock.PropertyMock)
+    def test_call_to_generate_configs(self, mock_docs_dir):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        after_all_decorator = AfterAllDecorator(function)
+        context = Mock(generate_docs_configs=True)
+        after_all_decorator(context)
+        context.html_doc_builder.save.assert_not_called()
 
 
 class TestBeforeFeatureDecorator(unittest.TestCase):
@@ -125,38 +140,21 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         mock_features_configs_dir.return_value = "enviroment_dir/behave_django_autodoc/features_configs"
         before_feature_decorator.features_configs_dir = "features_configs_dir"
         with self.assertRaises(FileNotFoundError):
-            before_feature_decorator.get_feature_config_path(feature)
+            before_feature_decorator.load_feature_config(feature)
 
-    @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
+    @mock.patch('behave_django_autodoc.decorators.os.path.exists')
     @mock.patch('behave_django_autodoc.decorators.open')
     @mock.patch('behave_django_autodoc.decorators.yaml.load')
     @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
     def test_load_feature_config(self, mock_get_feature_config_path, mock_yaml_load,
-                                 mock_open, mock_feature_to_dict):
+                                 mock_open, mock_file_exists):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         feature = Mock(filename="filename.feature")
         mock_get_feature_config_path.return_value = "config_path"
+        mock_file_exists.return_value = True
         before_feature_decorator = BeforeFeatureDecorator(function)
-        mock_feature_to_dict.return_value = {}
         before_feature_decorator.load_feature_config(feature)
         file_handle = mock_open.return_value.__enter__.return_value
-        mock_yaml_load.assert_called_once_with(file_handle, Loader=yaml.FullLoader)
-
-    @mock.patch('behave_django_autodoc.decorators.yaml.dump')
-    @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
-    @mock.patch('behave_django_autodoc.decorators.open')
-    @mock.patch('behave_django_autodoc.decorators.yaml.load')
-    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
-    def test_load_feature_config_when_file_not_exist(self, mock_get_feature_config_path, mock_yaml_load,
-                                                     mock_open, mock_feature_to_dict, mock_yaml_dump):
-        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
-        feature = Mock(filename="filename.feature")
-        mock_get_feature_config_path.return_value = "config_path"
-        before_feature_decorator = BeforeFeatureDecorator(function)
-        mock_feature_to_dict.return_value = {}
-        before_feature_decorator.load_feature_config(feature)
-        file_handle = mock_open.return_value.__enter__.return_value
-        mock_yaml_dump.assert_called_once_with({}, file_handle, default_flow_style=False)
         mock_yaml_load.assert_called_once_with(file_handle, Loader=yaml.FullLoader)
 
     def test_extract_feature_config(self):
@@ -173,7 +171,7 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         before_feature_decorator = BeforeFeatureDecorator(function)
         feature = Mock(filename="filename.feature")
-        context = Mock()
+        context = Mock(generate_docs_configs=False)
         mock_load_feature_config.return_value = {"title": "feature", "description": "description",
                                                  "scenarios": [{"scenario": "scenario"}]},
         mock_extract_feature_config.return_value = {"title": "feature", "description": "description"}
@@ -184,6 +182,16 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         function.assert_called_once_with(context, feature)
         context.html_doc_builder.add_feature.assert_called()
         self.assertEqual(context.feature_doc_config, before_feature_decorator.load_feature_config.return_value)
+
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.get_feature_config_path')
+    @mock.patch('behave_django_autodoc.decorators.BeforeFeatureDecorator.create_feature_config')
+    def test_call_to_generate_configs(self, mock_create_feature_config, mock_get_feature_config_path):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_feature_decorator = BeforeFeatureDecorator(function)
+        feature = Mock(filename="filename.feature")
+        context = Mock(generate_docs_configs=True)
+        before_feature_decorator(context, feature)
+        mock_create_feature_config.assert_called_once_with(mock_get_feature_config_path.return_value, feature)
 
 
 class TestAfterFeatureDecorator(unittest.TestCase):
@@ -219,13 +227,28 @@ class TestBeforeScenarioDecorator(unittest.TestCase):
         scenario.name = "title1"
         feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
                                         {"title": "title2", "description": "description2"}]}
-        context = Mock(feature_doc_config=feature_config)
+        context = Mock(feature_doc_config=feature_config, generate_docs_configs=False)
         before_scenario_decorator(context, scenario)
         function.assert_called_once_with(context, scenario)
         before_scenario_decorator.load_scenario_config_doc.assert_called_once_with(context, scenario)
         context.html_doc_builder.add_scenario.assert_called_once_with(
             Scenario(before_scenario_decorator.load_scenario_config_doc.return_value))
         self.assertEqual(context.scenario_doc_config, before_scenario_decorator.load_scenario_config_doc.return_value)
+
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_scenario')
+    @mock.patch('behave_django_autodoc.decorators.BeforeScenarioDecorator.load_scenario_config_doc')
+    def test_call_to_generate_configs(self, mock_load_scenario_config_doc, mock_add_scenario):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_scenario_decorator = BeforeScenarioDecorator(function)
+        scenario = Mock()
+        scenario.name = "title1"
+        feature_config = {"scenarios": [{"title": "title1", "description": "description1"},
+                                        {"title": "title2", "description": "description2"}]}
+        context = Mock(feature_doc_config=feature_config, generate_docs_configs=True)
+        before_scenario_decorator(context, scenario)
+        function.assert_called_once_with(context, scenario)
+        before_scenario_decorator.load_scenario_config_doc.assert_not_called()
+        context.html_doc_builder.add_scenario.assert_not_called()
 
 
 class TestAfterScenarioDecorator(unittest.TestCase):
@@ -277,12 +300,27 @@ class TestBeforeStepDecorator(unittest.TestCase):
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
                                       "screenshot-time": "before", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_doc_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config, generate_docs_configs=False)
         before_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot-time": "before", "screenshot": False})
         context.html_doc_builder.add_step.assert_called_once_with(
             step_config_doc, before_step_decorator.images_dir, context)
+        function.assert_called_once_with(context, step)
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.join')
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
+    def test_call_to_generate_docs_config(self, mock_add_step, mock_os_path_join):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_step_decorator = BeforeStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1",
+                                      "screenshot-time": "before", "screenshot": False},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_doc_config=scenario_config, generate_docs_configs=True)
+        before_step_decorator(context, step)
+        context.html_doc_builder.add_step.assert_not_called()
         function.assert_called_once_with(context, step)
 
 
@@ -324,10 +362,25 @@ class TestAfterStepDecorator(unittest.TestCase):
         scenario_config = {"steps": [{"title": "title1", "description": "description1",
                                       "screenshot-time": "after", "screenshot": False},
                                      {"title": "title2", "description": "description2"}]}
-        context = Mock(scenario_doc_config=scenario_config)
+        context = Mock(scenario_doc_config=scenario_config, generate_docs_configs=False)
         after_step_decorator(context, step)
         step_config_doc = Step({"title": "title1", "description": "description1",
                                "screenshot-time": "after", "screenshot": False})
         context.html_doc_builder.add_step.assert_called_once_with(step_config_doc,
                                                                   after_step_decorator.images_dir, context)
+        function.assert_called_once_with(context, step)
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.join')
+    @mock.patch('behave_django_autodoc.decorators.HtmlBuilder.add_step')
+    def test_call_to_generate_docs_config(self, mock_add_step, mock_os_path_join):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        after_step_decorator = AfterStepDecorator(function)
+        step = Mock()
+        step.name = "title1"
+        scenario_config = {"steps": [{"title": "title1", "description": "description1",
+                                      "screenshot-time": "after", "screenshot": False},
+                                     {"title": "title2", "description": "description2"}]}
+        context = Mock(scenario_doc_config=scenario_config, generate_docs_configs=True)
+        after_step_decorator(context, step)
+        context.html_doc_builder.add_step.assert_not_called()
         function.assert_called_once_with(context, step)
