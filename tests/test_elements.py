@@ -106,7 +106,7 @@ class TestStep(unittest.TestCase):
 
     def test_by_default_vertical_layout(self):
         step = Step({"title": "test title"})
-        self.assertEqual(step.layout, "vertical")
+        self.assertEqual(step.layout, "horizontal")
 
     def test_not_accept_invalid_layout(self):
         with self.assertRaises(ValueError):

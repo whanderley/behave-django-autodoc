@@ -69,7 +69,7 @@ class Step(object):
     """
 
     DEFAULT_STEP_CONFIG = {
-        'layout': 'vertical',
+        'layout': 'horizontal',
         'screenshot': True,
         'screenshot-time': 'after',
         'no-title': False,
