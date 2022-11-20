@@ -77,7 +77,8 @@ class TestBeforeAllDecorator(unittest.TestCase):
         before_all_decorator
         self.assertEqual(before_all_decorator.initialize_html_documentation().__class__, HtmlBuilder)
 
-    def test_call(self):
+    @mock.patch('behave_django_autodoc.decorators.os.makedirs')
+    def test_call(self, mock_makedirs):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         before_all_decorator = BeforeAllDecorator(function)
         context = Mock()
@@ -87,7 +88,8 @@ class TestBeforeAllDecorator(unittest.TestCase):
         function.assert_called_once_with(context)
         self.assertEqual(context.html_doc_builder.__class__, HtmlBuilder)
 
-    def test_call_to_generate_configs(self):
+    @mock.patch('behave_django_autodoc.decorators.os.makedirs')
+    def test_call_to_generate_configs(self, mock_makedirs):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
         before_all_decorator = BeforeAllDecorator(function, True)
         context = Mock(generate_docs_configs=False)
