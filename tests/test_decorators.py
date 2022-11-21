@@ -2,6 +2,7 @@ import unittest
 from unittest import mock
 from unittest.mock import Mock
 
+import ruamel
 import yaml
 
 from behave_django_autodoc.decorators import AfterAllDecorator
@@ -194,6 +195,23 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         context = Mock(generate_docs_configs=True)
         before_feature_decorator(context, feature)
         mock_create_feature_config.assert_called_once_with(mock_get_feature_config_path.return_value, feature)
+
+    @mock.patch('behave_django_autodoc.decorators.os.path.exists')
+    @mock.patch('behave_django_autodoc.decorators.open')
+    @mock.patch('behave_django_autodoc.decorators.ruamel.yaml.dump')
+    @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
+    def test_create_features_configs(self, mock_feature_to_dict, mock_dump, mock_open, mock_exists):
+        function = Mock(__globals__={"__file__": "dir/enviroment.py"})
+        before_all_decorator = BeforeFeatureDecorator(function, True)
+        feature = Mock()
+        mock_exists.return_value = False
+        before_all_decorator.create_feature_config('feature_config_path', feature)
+        mock_exists.assert_called_once_with("feature_config_path")
+        mock_open.assert_called_once_with("feature_config_path", 'w+')
+        mock_feature_to_dict.assert_called_once_with()
+        mock_dump.assert_called_once_with(mock_feature_to_dict.return_value,
+                                          mock_open.return_value.__enter__.return_value,
+                                          Dumper=ruamel.yaml.RoundTripDumper)
 
 
 class TestAfterFeatureDecorator(unittest.TestCase):

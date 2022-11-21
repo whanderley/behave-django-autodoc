@@ -3,6 +3,7 @@ Module containing decorators to environmental controls from behave.
 """
 import os
 
+import ruamel.yaml
 import yaml
 
 from behave_django_autodoc.elements import Feature
@@ -124,7 +125,8 @@ class BeforeFeatureDecorator(BaseDecorator):
         """Create feature config."""
         if not os.path.exists(feature_config_path):
             with open(feature_config_path, 'w+') as outfile:
-                yaml.dump(FeatureTransformer(feature).feature_to_dict(), outfile, default_flow_style=False)
+                ruamel.yaml.dump(FeatureTransformer(feature).feature_to_dict(),
+                                 outfile, Dumper=ruamel.yaml.RoundTripDumper)
 
     def get_feature_config_path(self, feature):
         """Return feature config path."""

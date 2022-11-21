@@ -2,6 +2,7 @@
 Module to build the html string containing the documentation.
 """
 import os
+import re
 
 from pkg_resources import resource_string
 
@@ -41,7 +42,7 @@ class HtmlBuilder(object):
             context: behave context
         """
         if step.screenshot:
-            screenshot_path = os.path.join(images_dir, step.title)
+            screenshot_path = os.path.join(images_dir, re.sub(r"\W|^(?=\d)", '_', step.title) + ".png")
             image64 = BrowserDriver(context.browser).take_screenshot(screenshot_path)
             self.string += step.to_html(image64)
         else:

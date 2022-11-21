@@ -1,5 +1,6 @@
 """Test class to transform behave features to dict"""
 import unittest
+from collections import OrderedDict
 from unittest.mock import Mock
 
 from behave_django_autodoc.feature_transformer import FeatureTransformer
@@ -24,7 +25,7 @@ class FeatureParserTest(unittest.TestCase):
         feature = Mock()
         scenario = Mock()
         scenario.name = 'I have a scenario'
-        scenario.description = 'And some description'
+        scenario.description = ['And some description']
         step = Mock()
         step.name = 'I have a step'
         step.text = 'And some text'
@@ -49,7 +50,7 @@ class FeatureParserTest(unittest.TestCase):
         scenario.steps = [step]
         feature.scenarios = [scenario]
         feature_parser = FeatureTransformer(feature)
-        expected_dict = {
+        expected_dict = OrderedDict({
             'title': 'I have a feature',
             'description': 'And some description',
             'scenarios': [
@@ -64,5 +65,5 @@ class FeatureParserTest(unittest.TestCase):
                     ]
                 }
             ]
-        }
+        })
         self.assertEqual(feature_parser.feature_to_dict(), expected_dict)

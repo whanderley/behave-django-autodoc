@@ -36,7 +36,7 @@ class TestHtmlBuilder(unittest.TestCase):
         step = mock.Mock(to_html=mock.Mock(return_value="step string"), screenshot=True, title="title2")
         html_builder.add_step(step, 'images_dir', context)
         step.to_html.assert_called_with('Image string base64')
-        mock_join.assert_called_with('images_dir', 'title2')
+        mock_join.assert_called_with('images_dir', 'title2.png')
         self.assertIn("step string", html_builder.string)
 
     @mock.patch('behave_django_autodoc.html_builder.os.path.join')
