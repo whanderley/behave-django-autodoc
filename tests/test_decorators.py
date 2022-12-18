@@ -2,8 +2,8 @@ import unittest
 from unittest import mock
 from unittest.mock import Mock
 
-import ruamel
 import yaml
+import yamlordereddictloader
 
 from behave_django_autodoc.decorators import AfterAllDecorator
 from behave_django_autodoc.decorators import AfterFeatureDecorator
@@ -198,7 +198,7 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
 
     @mock.patch('behave_django_autodoc.decorators.os.path.exists')
     @mock.patch('behave_django_autodoc.decorators.open')
-    @mock.patch('behave_django_autodoc.decorators.ruamel.yaml.dump')
+    @mock.patch('behave_django_autodoc.decorators.yaml.dump')
     @mock.patch('behave_django_autodoc.decorators.FeatureTransformer.feature_to_dict')
     def test_create_features_configs(self, mock_feature_to_dict, mock_dump, mock_open, mock_exists):
         function = Mock(__globals__={"__file__": "dir/enviroment.py"})
@@ -211,7 +211,8 @@ class TestBeforeFeatureDecorator(unittest.TestCase):
         mock_feature_to_dict.assert_called_once_with()
         mock_dump.assert_called_once_with(mock_feature_to_dict.return_value,
                                           mock_open.return_value.__enter__.return_value,
-                                          Dumper=ruamel.yaml.RoundTripDumper)
+                                          Dumper=yamlordereddictloader.Dumper,
+                                          default_flow_style=False)
 
 
 class TestAfterFeatureDecorator(unittest.TestCase):

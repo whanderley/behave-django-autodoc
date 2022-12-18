@@ -3,8 +3,8 @@ Module containing decorators to environmental controls from behave.
 """
 import os
 
-import ruamel.yaml
 import yaml
+import yamlordereddictloader
 
 from behave_django_autodoc.elements import Feature
 from behave_django_autodoc.elements import Scenario
@@ -125,8 +125,9 @@ class BeforeFeatureDecorator(BaseDecorator):
         """Create feature config."""
         if not os.path.exists(feature_config_path):
             with open(feature_config_path, 'w+') as outfile:
-                ruamel.yaml.dump(FeatureTransformer(feature).feature_to_dict(),
-                                 outfile, Dumper=ruamel.yaml.RoundTripDumper)
+                yaml.dump(FeatureTransformer(feature).feature_to_dict(),
+                          outfile, Dumper=yamlordereddictloader.Dumper,
+                          default_flow_style=False)
 
     def get_feature_config_path(self, feature):
         """Return feature config path."""
@@ -147,7 +148,8 @@ class BeforeFeatureDecorator(BaseDecorator):
         Extract feature config(title and description).
         Ignore scenarios and steps.
         """
-        return {key: feature_dict[key] for key in feature_dict if key in ['title', 'description']}
+        feature_dict = dict(feature_dict)
+        return {key: feature_dict[key] for key in feature_dict.keys() if key in ['title', 'description']}
 
 
 class AfterFeatureDecorator(BaseDecorator):
